@@ -1,0 +1,6 @@
+#!/bin/bash
+npm install
+cp -R ../rethinkdb-pool node_modules
+sleep 3
+coffee -c public/js/*.coffee
+coffee server

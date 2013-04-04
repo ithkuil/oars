@@ -1,0 +1,76 @@
+body, label, div, p, input, select, span {
+	font-family: Helvetica, Arial, sans-serif;
+}
+
+label {
+	display: block;
+	margin-top: 5px;
+}
+
+.error {
+	color: red;
+}
+
+body {
+	margin: 20px;
+  padding-top: 0px;
+  background-color: #F8F5FA;
+}
+
+ul {
+  list-style-type: none;
+  margin-left: 0px;
+}
+
+li {
+  margin-bottom: 10px;
+  list-style-type: none;
+}
+
+.search {
+  float: right;
+}
+
+header {
+  border-top: 2px solid black;
+  border-bottom: 2px solid black;
+  padding-bottom: 10px;
+  padding-top: 10px;
+  padding: 10px;
+}
+
+.navleft {
+  border: 1px solid black;
+  padding: 20px;
+  padding-left: 10px;
+  margin-top: 0px;
+  text-align: left;
+}
+
+.twit {
+  height: 290px;
+}
+
+
+.upcoming {
+  border: 1px solid black;
+  padding: 10px;
+  height: 290px;
+}
+
+#mainctl {
+  margin-top: 30px;
+}
+
+.feeds {
+  height: 350px;
+  padding: 15px;
+}
+
+.onepane {
+  height: 300px;
+}
+
+.high1 {
+  background-color: #fff;
+}
