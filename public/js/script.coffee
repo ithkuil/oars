@@ -8,16 +8,25 @@ DashCntl = ($scope, $routeParams, $resource) ->
   $scope.name = "DashCntl"
   $scope.params = $routeParams
 
+SelectCntl = ($scope, $routeParams, $resource) ->
+  $scope.$resource = $resource
+  $scope.name = "SelectCntl"
+  $scope.params = $routeParams
+
 AddTitleCntl = ($scope, $routeParams) ->
   $scope.name = "AddTitleCntl"
   $scope.params = $routeParams
 
 mod = ($routeProvider, $locationProvider) ->
-  $routeProvider.when "/dash",
+  $routeProvider.when "/",
+    templateUrl: "/select.html"
+    controller: SelectCntl
+
+  $routeProvider.when "/opp/dash",
     templateUrl: "/dash.html"
     controller: DashCntl
 
-  $routeProvider.when "/addtitle",
+  $routeProvider.when "/opp/addtitle",
     templateUrl: "/addtitle.html"
     controller: AddTitleCntl
 

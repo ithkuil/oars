@@ -52,22 +52,22 @@
   </head>
   <body>
     <article class="container">
-      <header class="high1 sixteen columns">
-        <div class="eleven columns">
-          OARS - Oppportunities
-        </div>
-        <div class="search one columns">
-          <input class="search"/>
-        </div>
-      </header>
       <div id="msg"></div>
       <div ng-controller="MainCntl" id="mainctl">
-        <div class="navleft two columns high1">
+        <div class="head high1 sixteen columns">
+          <div class="eleven columns">
+            OARS
+          </div>
+          <div class="search one columns">
+           <input class="search"/>
+          </div>
+        </div>
+        <div class="navleft two columns high1" ng-show="$location.path() != '/'">
           <ul>
-            <li><a href="/dash">Dashboard</a></li>
-            <li><a href="/addtitle">Add Title</a></li>
-            <li><a href="/browse">Browse Titles</a></li>
-            <li><a href="/settings">Settings</a></li>
+            <li><a href="/opp/dash">Dashboard</a></li>
+            <li><a href="/opp/addtitle">Add Title</a></li>
+            <li><a href="/opp/browse">Browse Titles</a></li>
+            <li><a href="/opp/settings">Settings</a></li>
           </ul>
         </div>
         <div ng-view class="thirteen columns"></div>

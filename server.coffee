@@ -16,8 +16,8 @@ app.use express.static('public')
 
 html = fs.readFileSync 'index.html', 'utf8'
 
-app.get '/', (req, res) ->
-  res.redirect '/dash'
+#app.get '/', (req, res) ->
+#  res.redirect '/dash'
 
 app.get "/feed/:url", (req, res) ->
   feedParser.parseUrl req.params.url, (err, meta, articles) ->
