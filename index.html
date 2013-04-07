@@ -54,7 +54,10 @@
       <div ng-controller="MainCntl" id="mainctl">
         <div class="head high1 sixteen columns">
           <div class="eleven columns">
-            OARS
+            <span ng-repeat="crumb in crumblinks">
+              <span class="sep{{$index}}">|</span>
+              <a ng-class="" href="{{crumb.path}}">{{crumb.name}}</a>
+            </span>
           </div>
           <div class="search one columns">
            <input class="search"/>

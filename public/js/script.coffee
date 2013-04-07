@@ -1,21 +1,89 @@
+angular.module("data", ["ngResource"]).factory "Event", ($resource) ->
+  Event = $resource("/data/events/:id",
+    blah: ""
+  ,
+    update:
+      method: "POST"
+  )
+  Event::update = (cb) ->
+    Event.update
+      id: @_id.$oid
+    , angular.extend({}, this,
+      _id: `undefined`
+    ), cb
+
+  Event::destroy = (cb) ->
+    Event.remove
+      id: @_id.$oid
+    , cb
+
+  Event
+
 window.MainCntl = ($scope, $route, $routeParams, $location, $http) ->
   $scope.$route = $route
   $scope.$location = $location
   $scope.$routeParams = $routeParams
-
-DashCntl = ($scope, $routeParams, $resource) ->
-  $scope.$resource = $resource
-  $scope.name = "DashCntl"
-  $scope.params = $routeParams
+  $scope.crumbs = [ '/opp/addtitle=Add Title', '/opp/dash=Dashboard',
+                    '/opp/settings=Settings','/opp/Settings=Settings',
+                    '/opp=Opportunities', '/=OARS' ]
+  $scope.breadcrumb = ->
+    path = $scope.$location.path()
+    parts = []
+    for str, i in $scope.crumbs
+      if str? and str?.length > 0
+        [ pathpart, name ] = str.split '='
+      if path.indexOf(pathpart) >= 0
+        parts.unshift { path: pathpart, name: name }
+    parts
 
 SelectCntl = ($scope, $routeParams, $resource) ->
   $scope.$resource = $resource
   $scope.name = "SelectCntl"
   $scope.params = $routeParams
+  $scope.$parent.crumblinks = $scope.$parent.breadcrumb()
+
+DashCntl = ($scope, $routeParams, $resource) ->
+  $scope.$resource = $resource
+  $scope.name = "DashCntl"
+  $scope.params = $routeParams
+  $scope.$parent.crumblinks = $scope.$parent.breadcrumb()
 
 AddTitleCntl = ($scope, $routeParams) ->
   $scope.name = "AddTitleCntl"
   $scope.params = $routeParams
+  $scope.$parent.crumblinks = $scope.$parent.breadcrumb()
+
+SettingsCntl = ($scope, $routeParams) ->
+  $scope.name = "SettingsCntl"
+  $scope.params = $routeParams
+  $scope.$parent.crumblinks = $scope.$parent.breadcrumb()
+
+ListCntl = ($scope, Event) ->
+  $scope.events = Event.query()
+
+NewEventCntl = ($scope, $location, Event) ->
+  $scope.save = ->
+    Event.save $scope.event, (event) ->
+      $location.path "/opp/edit/" + event._id.$oid
+
+EditEventCntl = ($scope, $location, $routeParams, Event) ->
+  self = this
+  Event.get
+    id: $routeParams.eventId
+  , (event) ->
+    self.original = event
+    $scope.event = new Event(self.original)
+
+  $scope.isClean = ->
+    angular.equals self.original, $scope.event
+
+  $scope.destroy = ->
+    self.original.destroy ->
+      $location.path "/opp/settings"
+
+  $scope.save = ->
+    $scope.event.update ->
+      $location.path "/opp/settings"
 
 mod = ($routeProvider, $locationProvider) ->
   $routeProvider.when "/",
@@ -30,9 +98,21 @@ mod = ($routeProvider, $locationProvider) ->
     templateUrl: "/addtitle.html"
     controller: AddTitleCntl
 
+  $routeProvider.when "/opp/settings",
+    templateUrl: "/settings.html"
+    controller: SettingsCntl
+
+  $routeProvider.when "/opp/event/new",
+    templateUrl: "/eventdetail.html"
+    controller: NewEventCntl
+
+  $routeProvider.when "/opp/event/edit/:eventId",
+    templateUrl: "/eventdetail.html"
+    controller: EditEventCntl
+
   $locationProvider.html5Mode true
 
-viewMod = angular.module "ngView", [ "ngResource" ], mod
+viewMod = angular.module "ngView", [ "ngResource", "data" ], mod
 
 
 viewMod.directive "feed", ($resource) ->

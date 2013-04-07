@@ -60,7 +60,7 @@ li {
 }
 
 #mainctl {
-  margin-top: 30px;
+  margin-top: 0px;
 }
 
 .feeds {
@@ -77,4 +77,8 @@ li {
 }
 
 .padhead {
+}
+
+.sep0 {
+  display: none;
 }
