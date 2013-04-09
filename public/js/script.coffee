@@ -121,11 +121,15 @@ viewMod.directive "feed", ($resource) ->
   restrict: "E"
   replace: true
   transclude: false
+  scope: {title : '@'}
   template: "<div><li ng-class=\"{doneloading: (articles.length>0)}\">Loading...</li><li ng-repeat=\"article in articles\"><a href=\"{{article.link}}\" target=\"_blank\" >{{article.title}}</a></li></div>"
   link: (scope, element, attrs) ->
     Feed = $resource "/feed/" + encodeURIComponent(attrs.url)
-    scope.$on 'selpane', (ev) ->
-      scope.articles = Feed.query( {  }, ->  )
+    scope.parentNode = element.parentNode
+    scope.$on 'selpane', (ev, args) ->
+      if args.title is scope.title
+        console.log 'matches title'
+        scope.articles = Feed.query( {  }, ->  )
 
 viewMod.directive "upcoming", ($resource) ->
   restrict: "E"
@@ -147,7 +151,7 @@ viewMod.directive 'tabs', ->
       for p in panes
         p.selected = false
       pane.selected = true
-      $scope.$broadcast 'selpane', {test:1}
+      $scope.$broadcast 'selpane', { title: pane.title, pane: pane }
 
     @addPane = (pane) ->
       if panes.length is 0 then $scope.select pane

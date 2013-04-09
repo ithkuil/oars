@@ -152,12 +152,19 @@
       restrict: "E",
       replace: true,
       transclude: false,
+      scope: {
+        title: '@'
+      },
       template: "<div><li ng-class=\"{doneloading: (articles.length>0)}\">Loading...</li><li ng-repeat=\"article in articles\"><a href=\"{{article.link}}\" target=\"_blank\" >{{article.title}}</a></li></div>",
       link: function(scope, element, attrs) {
         var Feed;
         Feed = $resource("/feed/" + encodeURIComponent(attrs.url));
-        return scope.$on('selpane', function(ev) {
-          return scope.articles = Feed.query({}, function() {});
+        scope.parentNode = element.parentNode;
+        return scope.$on('selpane', function(ev, args) {
+          if (args.title === scope.title) {
+            console.log('matches title');
+            return scope.articles = Feed.query({}, function() {});
+          }
         });
       }
     };
@@ -195,7 +202,8 @@
           }
           pane.selected = true;
           return $scope.$broadcast('selpane', {
-            test: 1
+            title: pane.title,
+            pane: pane
           });
         };
         return this.addPane = function(pane) {
