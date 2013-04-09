@@ -175,10 +175,6 @@ viewMod.directive 'pane', ->
   transclude: true
   scope: { title: '@' }
   controller: ($scope, $element) ->
-    $scope.$on 'selpane', (ev, opts) ->
-      console.log 'pane selpane event'
-      return
-      #console.log ev
   link: (scope, element, attrs, tabsCtrl) ->
     tabsCtrl.addPane scope
   template:

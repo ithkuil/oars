@@ -67,7 +67,10 @@ app.post '/data/events', (req, res) ->
 getFeed = (url, cb) ->
   feedParser.parseUrl url, (err, meta, articles) ->
     if not err?
-      feeds[url] = articles
+      filtered = []
+      for article in articles
+        filtered.push { link: article.link, title: article.title }
+      feeds[url] = filtered
     cb? feeds[url]
 
 app.get "/feed/:url", (req, res) ->
