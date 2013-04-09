@@ -1,16 +1,17 @@
 <form name="myForm">
   <h4>Event</h4>
-  <div class="control-group" ng-class="{error: myForm.name.$invalid}">
-    <label>Date</label>
-    <input type="text" name="name" ng-model="event.date" required>
-    <span ng-show="myForm.date.$error.required" class="help-inline">
-        Required</span>
-  </div>
 
   <div class="control-group" ng-class="{error: myForm.description.$invalid}">
     <label>Description</label>
     <input type="text"  name="description" ng-model="event.description" required>
     <span ng-show="myForm.description.$error.required" class="help-inline">
+        Required</span>
+  </div>
+
+  <div class="control-group" ng-class="{error: myForm.name.$invalid}">
+    <label>Date</label>
+    <input type="text" name="name" ng-model="event.date" required ui-date>
+    <span ng-show="myForm.date.$error.required" class="help-inline">
         Required</span>
   </div>
 

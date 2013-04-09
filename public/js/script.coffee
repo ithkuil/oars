@@ -1,20 +1,21 @@
+delay = (ms, func) -> setTimeout func, ms
+
 angular.module("data", ["ngResource"]).factory "Event", ($resource) ->
-  Event = $resource("/data/events/:id",
-    blah: ""
+  Event = $resource("/data/events/:id", {}
   ,
     update:
-      method: "POST"
+      method: "PUT"
   )
   Event::update = (cb) ->
     Event.update
-      id: @_id.$oid
+      id: @_id #@_id.$oid
     , angular.extend({}, this,
       _id: `undefined`
     ), cb
 
   Event::destroy = (cb) ->
     Event.remove
-      id: @_id.$oid
+      id: @_id
     , cb
 
   Event
@@ -64,13 +65,14 @@ ListCntl = ($scope, Event) ->
 NewEventCntl = ($scope, $location, Event) ->
   $scope.save = ->
     Event.save $scope.event, (event) ->
-      $location.path "/opp/edit/" + event._id.$oid
+      $location.path "/opp/settings"
 
 EditEventCntl = ($scope, $location, $routeParams, Event) ->
   self = this
   Event.get
     id: $routeParams.eventId
   , (event) ->
+    event.date = new Date(event.date)
     self.original = event
     $scope.event = new Event(self.original)
 
@@ -112,31 +114,32 @@ mod = ($routeProvider, $locationProvider) ->
 
   $locationProvider.html5Mode true
 
-viewMod = angular.module "ngView", [ "ngResource", "data" ], mod
+viewMod = angular.module "ngView", [ "ngResource", "data", "ui" ], mod
 
 
 viewMod.directive "feed", ($resource) ->
   restrict: "E"
   replace: true
   transclude: false
-  template: "<li ng-repeat=\"article in articles\"><a href=\"{{article.link}}\" target=\"_blank\" >{{article.title}}</a></li>"
+  template: "<div><li ng-class=\"{doneloading: (articles.length>0)}\">Loading...</li><li ng-repeat=\"article in articles\"><a href=\"{{article.link}}\" target=\"_blank\" >{{article.title}}</a></li></div>"
   link: (scope, element, attrs) ->
     Feed = $resource "/feed/" + encodeURIComponent(attrs.url)
-    scope.articles = Feed.query( {  }, ->  )
+    scope.$on 'selpane', (ev) ->
+      scope.articles = Feed.query( {  }, ->  )
 
 viewMod.directive "upcoming", ($resource) ->
   restrict: "E"
   replace: true
   transclude: false
-  template: "<li ng-repeat=\"ev in evts\">{{ev.date}} {{ev.title}}</li>"
+  template: "<li ng-repeat=\"ev in evts\"><a href=\"/opp/event/edit/{{ev._id}}\">{{ev.date}} {{ev.description}}</a></li>"
   link: (scope, element, attrs) ->
     Upcoming = $resource "/upcoming"
     scope.evts = Upcoming.query( { blah: 'hello' }, ->  )
+    scope.$on
 
 viewMod.directive 'tabs', ->
   restrict: 'E'
   transclude: true
-  scope: {}
   controller: ($scope, $element) ->
     panes = $scope.panes = []
 
@@ -144,6 +147,7 @@ viewMod.directive 'tabs', ->
       for p in panes
         p.selected = false
       pane.selected = true
+      $scope.$broadcast 'selpane', {test:1}
 
     @addPane = (pane) ->
       if panes.length is 0 then $scope.select pane
@@ -166,9 +170,14 @@ viewMod.directive 'pane', ->
   restrict: 'E'
   transclude: true
   scope: { title: '@' }
+  controller: ($scope, $element) ->
+    $scope.$on 'selpane', (ev, opts) ->
+      console.log 'pane selpane event'
+      return
+      #console.log ev
   link: (scope, element, attrs, tabsCtrl) ->
     tabsCtrl.addPane scope
   template:
-    '<div class="tab-pane" ng-class="{active: selected}" ng-transclude>' +
+    '<div class="tab-pane" ng-class="{active: selected}" ng-show="selected" ng-transclude>' +
     '</div>'
   replace: true

@@ -82,3 +82,7 @@ li {
 .sep0 {
   display: none;
 }
+
+.doneloading {
+  display: none;
+}
