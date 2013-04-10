@@ -57,9 +57,6 @@ app.put '/data/events/:id', (req, res) ->
 
 
 app.post '/data/events', (req, res) ->
-  console.log '-- post event'
-  console.log req.body
-  console.log req.path
   events.insert req.body
   res.end('1')
 
