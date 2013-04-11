@@ -1,1 +1,31 @@
+<form name="projectForm" class="high1">
 <h2>Add Title</h2>
+
+  <div class="control-group" ng-class="{error: projectForm.title.$invalid}">
+    <label>Title</label>
+    <input type="text"  name="description" ng-model="project.title" required>
+    <span ng-show="myForm.title.$error.required" class="help-inline">
+        Required</span>
+  </div>
+
+  <div class="control-group" ng-class="{error: projectForm.writers.$invalid}">
+    <div class="control-group">
+      <label>Writers</label>
+        <li ng-repeat="item in project.writers">{{item}}</li>
+        <input type="text" name="writer" ng-model="project.writeradd" >
+        <button ng-click="addWriter()" class="btn btn-primary up1">Add Writer</button>
+      </div>
+    <span ng-show="projectForm.writers.$error.required" class="help-inline">
+        Required</span>
+  </div>
+
+
+  <br>
+  <a href="#/" class="btn">Cancel</a>
+  <button ng-click="save()" ng-disabled="isClean() || projectForm.$invalid"
+          class="btn btn-primary">Save</button>
+  <button ng-click="destroy()"
+          ng-show="project._id" class="btn btn-danger">Delete</button>
+</form>
+
+</div>

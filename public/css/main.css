@@ -1,10 +1,12 @@
 body, label, div, p, input, select, span {
-	font-family: Helvetica, Arial, sans-serif;
+	font-family: 'Helvetica Neue', Arial, sans-serif;
+
 }
 
 label {
 	display: block;
 	margin-top: 5px;
+  text-transform: capitalize;
 }
 
 .error {
@@ -14,7 +16,7 @@ label {
 body {
 	margin: 20px;
   padding-top: 0px;
-  background-color: #F8F5FA;
+  background-color: rgb(81, 81, 81); /*  #F8F5FA; */
 }
 
 ul {
@@ -64,7 +66,7 @@ li {
 }
 
 .feeds {
-  height: 350px;
+  height: auto;
   padding: 15px;
 }
 
@@ -73,7 +75,13 @@ li {
 }
 
 .high1 {
-  background-color: #fff;
+  background-color: rgb(51, 51, 51);
+  color: rgb(207, 207, 207);
+  border-radius: 5px;
+  moz-border-radius: 5px;
+  webkit-border-radius: 5px;
+  padding: 15px;
+  border: 1px solid black;
 }
 
 .padhead {
@@ -85,4 +93,26 @@ li {
 
 .doneloading {
   display: none;
+}
+
+a, a:visited, a:active {
+  color: rgb(135, 194, 237);
+}
+
+.nav-tabs .active a, .nav-tabs .active a:hover, .nav-tabs .active a:focus {
+  background-color: rgb(51, 51, 51) !important;
+  color: rgb(207, 207, 207)  !important;
+}
+
+.nav > li > a:hover, .nav > li > a:focus {
+  background-color: rgb(51, 51, 51) !important;
+  color: rgb(207, 207, 207)  !important;
+}
+
+h2, h4 {
+  color: rgb(207, 207, 207);
+}
+
+.up1 {
+  margin-top: -10px;
 }

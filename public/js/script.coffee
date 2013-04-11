@@ -20,6 +20,27 @@ angular.module("data", ["ngResource"]).factory "Event", ($resource) ->
 
   Event
 
+  Project = $resource("/data/projects/:id", {}
+  ,
+    update:
+      method: "PUT"
+  )
+  Project::update = (cb) ->
+    Project.update
+      id: @_id #@_id.$oid
+    , angular.extend({}, this,
+      _id: `undefined`
+    ), cb
+
+  Project::destroy = (cb) ->
+    Project.remove
+      id: @_id
+    , cb
+
+  Project
+
+
+
 window.MainCntl = ($scope, $route, $routeParams, $location, $http) ->
   $scope.$route = $route
   $scope.$location = $location
@@ -53,6 +74,14 @@ AddTitleCntl = ($scope, $routeParams) ->
   $scope.name = "AddTitleCntl"
   $scope.params = $routeParams
   $scope.$parent.crumblinks = $scope.$parent.breadcrumb()
+  $scope.addWriter = ->
+    if $scope.project.writers?
+      $scope.project.writers.push $scope.project.writeradd
+    else
+      $scope.project.writers = [ $scope.project.writeradd ]
+  $scope.save = ->
+    Project.save $scope.project, (project) ->
+      $location.path "/opp/settings"
 
 SettingsCntl = ($scope, $routeParams) ->
   $scope.name = "SettingsCntl"
@@ -66,6 +95,32 @@ NewEventCntl = ($scope, $location, Event) ->
   $scope.save = ->
     Event.save $scope.event, (event) ->
       $location.path "/opp/settings"
+
+NewProjectCntl = ($scope, $location, Project) ->
+  $scope.save = ->
+    Project.save $scope.project, (data) ->
+      $location.path "/opp/settings"
+
+
+EditProjectCntl = ($scope, $location, $routeParams, Project) ->
+  self = this
+  Project.get
+    id: $routeParams.projectId
+  , (project) ->
+    self.original = project
+    $scope.project = new Event(self.original)
+
+  $scope.isClean = ->
+    angular.equals self.original, $scope.project
+
+  $scope.destroy = ->
+    self.original.destroy ->
+      $location.path "/opp/settings"
+
+  $scope.save = ->
+    $scope.project.update ->
+      $location.path "/opp/settings"
+
 
 EditEventCntl = ($scope, $location, $routeParams, Event) ->
   self = this
@@ -108,6 +163,10 @@ mod = ($routeProvider, $locationProvider) ->
     templateUrl: "/eventdetail.html"
     controller: NewEventCntl
 
+  $routeProvider.when "/opp/project/edit/:projectId",
+    templateUrl: "/addtitle.html"
+    controller: EditProjectCntl
+
   $routeProvider.when "/opp/event/edit/:eventId",
     templateUrl: "/eventdetail.html"
     controller: EditEventCntl
@@ -116,6 +175,24 @@ mod = ($routeProvider, $locationProvider) ->
 
 viewMod = angular.module "ngView", [ "ngResource", "data", "ui" ], mod
 
+viewMod.directive "listentry", ($resource) ->
+  restrict: "E"
+  replace: true
+  transclude: false
+  scope: { type : '@', display: '@', form: '@', model: '@'}
+  template: '<div class="control-group">' +
+            '<li ng-repeat=\"item in list\"><a href=\"/opp/data/{type}/1\">{{item.display}}</a></li>' +
+            """
+              <label>{{type}}</label>
+              <input type="text" name="{{type}}" ng-model="themodel" required>
+            </div>
+            """
+  link: (scope, element, attrs) ->
+    #scope.typeEl = 'false' # window[scope.form][scope.type]
+    scope.list = [{ display: 'test'}, {display: 'blah'}]
+    scope.themodel = scope.model
+    return
+    #Data = $resource "/opp/data/#{scope.type}"
 
 viewMod.directive "feed", ($resource) ->
   restrict: "E"
