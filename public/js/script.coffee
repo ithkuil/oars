@@ -46,7 +46,7 @@ window.MainCntl = ($scope, $route, $routeParams, $location, $http) ->
   $scope.$routeParams = $routeParams
   $scope.crumbs = [ '/opp/addtitle=Add Title', '/opp/dash=Dashboard',
                     '/opp/settings=Settings','/opp/Settings=Settings',
-                    '/opp=Opportunities', '/=OARS' ]
+                    '/opp/browse=Browse Titles','/opp=Opportunities', '/=OARS' ]
   $scope.breadcrumb = ->
     path = $scope.$location.path()
     parts = []
@@ -100,7 +100,7 @@ AddTitleCntl = ($scope, $location, $routeParams, Project) ->
     removeWriter $scope, idx
   $scope.save = ->
     Project.save $scope.project, (project) ->
-      $location.path "/opp/settings"
+      $location.path "/opp/browse"
 
 SettingsCntl = ($scope, $routeParams) ->
   $scope.name = "SettingsCntl"
