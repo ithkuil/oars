@@ -20,6 +20,7 @@ angular.module("data", ["ngResource"]).factory "Event", ($resource) ->
 
   Event
 
+angular.module("data", ["ngResource"]).factory "Project", ($resource) ->
   Project = $resource("/data/projects/:id", {}
   ,
     update:
@@ -38,8 +39,6 @@ angular.module("data", ["ngResource"]).factory "Event", ($resource) ->
     , cb
 
   Project
-
-
 
 window.MainCntl = ($scope, $route, $routeParams, $location, $http) ->
   $scope.$route = $route
@@ -70,15 +69,35 @@ DashCntl = ($scope, $routeParams, $resource) ->
   $scope.params = $routeParams
   $scope.$parent.crumblinks = $scope.$parent.breadcrumb()
 
-AddTitleCntl = ($scope, $routeParams) ->
+AddTitleCntl = ($scope, $location, $routeParams, Project) ->
   $scope.name = "AddTitleCntl"
   $scope.params = $routeParams
   $scope.$parent.crumblinks = $scope.$parent.breadcrumb()
+  $scope.statuses = ['In Development', 'Pre-Production','Filming',
+                     'Post-Production', 'Completed']
+  $scope.genres = ['Action','Adventure','Animation','Biography/Biopic',
+                    'Comedy','Crime','Documentary','Drama','Experimental',
+                    'Family','Fantasy','Film Noir','History','Horror',
+                    'Martial Arts','Musical','Mystery','Romance',
+                    'Science Fiction','Sports','Thriller','War']
   $scope.addWriter = ->
     if $scope.project.writers?
       $scope.project.writers.push $scope.project.writeradd
     else
       $scope.project.writers = [ $scope.project.writeradd ]
+    $scope.project.writeradd = ''
+  $scope.delete = (idx) ->
+    removeWriter $scope, idx
+  $scope.addCast = ->
+    if $scope.project.cast?
+      $scope.project.cast.push $scope.project.castadd
+    else
+      $scope.project.cast = [ $scope.project.castadd ]
+    $scope.project.castadd = ''
+  $scope.deleteCast = (idx) ->
+    $scope.project.cast.splice idx, 1
+  $scope.delete = (idx) ->
+    removeWriter $scope, idx
   $scope.save = ->
     Project.save $scope.project, (project) ->
       $location.path "/opp/settings"
@@ -88,6 +107,13 @@ SettingsCntl = ($scope, $routeParams) ->
   $scope.params = $routeParams
   $scope.$parent.crumblinks = $scope.$parent.breadcrumb()
 
+BrowseCntl = ($scope, $routeParams, $resource) ->
+  $scope.name = "BrowseCntl"
+  $scope.params = $routeParams
+  $scope.$parent.crumblinks = $scope.$parent.breadcrumb()
+  Project = $resource "/data/projects"
+  $scope.projects = Project.query( { }, ->  )
+
 ListCntl = ($scope, Event) ->
   $scope.events = Event.query()
 
@@ -96,11 +122,8 @@ NewEventCntl = ($scope, $location, Event) ->
     Event.save $scope.event, (event) ->
       $location.path "/opp/settings"
 
-NewProjectCntl = ($scope, $location, Project) ->
-  $scope.save = ->
-    Project.save $scope.project, (data) ->
-      $location.path "/opp/settings"
-
+removeWriter = (scope, idx) ->
+  scope.project.writers.splice idx, 1
 
 EditProjectCntl = ($scope, $location, $routeParams, Project) ->
   self = this
@@ -108,7 +131,7 @@ EditProjectCntl = ($scope, $location, $routeParams, Project) ->
     id: $routeParams.projectId
   , (project) ->
     self.original = project
-    $scope.project = new Event(self.original)
+    $scope.project = new Project(self.original)
 
   $scope.isClean = ->
     angular.equals self.original, $scope.project
@@ -158,6 +181,10 @@ mod = ($routeProvider, $locationProvider) ->
   $routeProvider.when "/opp/settings",
     templateUrl: "/settings.html"
     controller: SettingsCntl
+
+  $routeProvider.when "/opp/browse",
+    templateUrl: "/browse.html"
+    controller: BrowseCntl
 
   $routeProvider.when "/opp/event/new",
     templateUrl: "/eventdetail.html"

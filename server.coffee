@@ -37,10 +37,9 @@ events = db.collection 'events'
 
 app.get '/data/events/:id', (req, res) ->
   convertids req.params
-  events.findOne {_id: req.params._id}, (err, ev) ->
+  events.findOne { _id: req.params._id }, (err, ev) ->
     ev.date = new Date(ev.date)
     res.end JSON.stringify(ev)
-    #events.update { _id: req.params.id}, data,
 
 app.delete '/data/events/:id', (req, res) ->
   ids = { _id: req.params.id }
@@ -55,9 +54,37 @@ app.put '/data/events/:id', (req, res) ->
   events.update ids, req.body, (err) ->
     res.end('1')
 
-
 app.post '/data/events', (req, res) ->
   events.insert req.body
+  res.end('1')
+
+projects = db.collection 'projects'
+
+app.get '/data/projects', (req, res) ->
+  projects.find().toArray (e, arr) ->
+    res.end JSON.stringify(arr)
+
+app.get '/data/projects/:id', (req, res) ->
+  convertids req.params
+  projects.findOne {_id: req.params._id}, (err, ev) ->
+    ev.date = new Date(ev.date)
+    res.end JSON.stringify(ev)
+
+app.delete '/data/projects/:id', (req, res) ->
+  ids = { _id: req.params.id }
+  convertids ids
+  projects.remove ids, (err, ev) ->
+    res.end '1'
+
+app.put '/data/projects/:id', (req, res) ->
+  console.log '-- put project'
+  ids = { _id : req.params.id }
+  convertids ids
+  projects.update ids, req.body, (err) ->
+    res.end('1')
+
+app.post '/data/projects', (req, res) ->
+  projects.insert req.body
   res.end('1')
 
 
