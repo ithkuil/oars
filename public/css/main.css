@@ -116,3 +116,25 @@ h2, h4 {
 .up1 {
   margin-top: -10px;
 }
+
+li.project {
+  display: inline-block;
+  width: 200px;
+  margin: 10px;
+  padding: 10px;
+  background-color: rgb(54, 54, 54);
+  vertical-align: top;
+}
+
+.cardtext {
+  margin: 0px;
+}
+
+li.project label {
+  clear: both;
+  display: inline-block;
+  font-weight: bold;
+  margin: 0px;
+}
+
+
