@@ -99,6 +99,9 @@ AddTitleCntl = ($scope, $location, $routeParams, Project) ->
   $scope.delete = (idx) ->
     removeWriter $scope, idx
   $scope.save = ->
+    $scope.project.reviews = []
+    $scope.project.files = []
+    $scope.project.projections = []
     Project.save $scope.project, (project) ->
       $location.path "/opp/browse"
 

@@ -3,12 +3,16 @@
   <li class="project" ng-repeat="project in projects">
     <h5>{{project.title}}</h5>
     <div class="part1"><label>Status:</label><span class="cardtext">{{project.status}}</span></div>
-    <div class="part1"><label>Writers:</label><span class="cardtext">{{project.writers}}</span></div>
+    <div class="part1"><label>Writers:</label><span class="cardtext">{{project.writers.join(', ')}}</span></div>
+    <div class="part1"><label>Director:</label><span class="cardtext">{{project.director}}</span></div>
     <div class="part1"><label>Source:</label><span class="cardtext"> {{project.source}}</span></div>
-    <div class="part1"><label>Cast:</label><span class="cardtext">{{project.cast}}</span></div>
-    <div class="part1"><label>Synopsis:</label><span class="cardtext">{{project.synopsis}}</span></div>
+    <div class="part1"><label>Cast:</label><span class="cardtext">{{project.cast.join(', ')}}</span></div>
+    <div class="part1"><label>Synopsis:</label><span class="cardtext synopsis">{{project.synopsis}}</span></div>
     <div class="part1"><label>Genre:</label><span class="cardtext">{{project.genre}}</span></div>
     <div class="part1"><label>Budget:</label><span class="cardtext">{{project.budget}}</span></div>
-    <div class="part1"><label>IMDB:</label><span class="cardtext">{{project.imdb}}</span></div>
+    <div class="part1"><label><a href="{{project.imdb}}" target="_blank">IMDB</a></label></div>
+    <div class="attached">Add/View<br>{{project.reviews.length}} Reviews</div>
+    <div class="attached">Add/View<br>{{project.projections.length}} Projections</div>
+    <div class="attached">Add/View<br>{{project.projections.length}} Files</div>
   </li>
 </div>
