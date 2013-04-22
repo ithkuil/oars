@@ -1,5 +1,12 @@
 <div class="thirteen columns high1">
   <h4>Titles</h4>
+  <label class="filter">Status:</label><select class="filter" ng-model="filterStatus" ng-options="status for status in statusesx" ng-change="filter()"><option ng-selected="selected"></option></select>
+
+  <label class="filter">Source:</label><select class="filter" ng-model="filterSource" ng-options="src.name for src in sources" ng-change="filter()"><option ng-selected="selected"></option></select>
+
+  <label class="filter">Genre:</label><select class="filter" ng-model="filterGenre" ng-options="genre for genre in genres" ng-change="filter()"><option ng-selected="selected"></option></select>
+
+    <br>
   <li class="project" ng-repeat="project in projects">
     <h5>{{project.title}}</h5>
     <div class="part1"><label>Status:</label><span class="cardtext">{{project.status}}</span></div>

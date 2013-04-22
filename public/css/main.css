@@ -131,6 +131,7 @@ li.project {
   margin: 0px;
   margin-left: 10px;
   font-size: 10pt;
+  color: rgb(200,200,200);
 }
 
 .synopsis {
@@ -155,4 +156,18 @@ li.project label {
   padding: 3px;
   border: 1px solid black;
   width: 55px;
+}
+
+select.filter {
+  width: 150px;
+  margin-left: 15px;
+  height: 25px;
+  background-color: rgb(60,60,60);
+  color: rgb(150,150,150);
+  font-size: 10pt;
+  margin-right: 25px;
+}
+
+label.filter {
+  display: inline-block;
 }

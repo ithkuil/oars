@@ -60,9 +60,30 @@ app.post '/data/events', (req, res) ->
 
 projects = db.collection 'projects'
 
-app.get '/data/projects', (req, res) ->
-  projects.find().toArray (e, arr) ->
+app.get '/data/sources', (req, res) ->
+  projects.distinct 'source', (err, arr) ->
+    console.log JSON.stringify(arr)
+    ret = []
+    for source in arr
+      ret.push { name: source }
+    res.end JSON.stringify(ret)
+
+app.get '/data/statuses', (req, res) ->
+  projects.distinct('status').toArray (e, arr) ->
     res.end JSON.stringify(arr)
+
+app.get '/data/genres', (req, res) ->
+  projects.distinct('genre').toArray (e, arr) ->
+    res.end JSON.stringify(arr)
+
+app.get '/data/projects', (req, res) ->
+  if req.query.filter?
+    filter = JSON.parse req.query.filter
+    projects.find(filter).toArray (e, arr) ->
+      res.end JSON.stringify(arr)
+  else
+    projects.find().toArray (e, arr) ->
+      res.end JSON.stringify(arr)
 
 app.get '/data/projects/:id', (req, res) ->
   convertids req.params

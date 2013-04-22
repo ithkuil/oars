@@ -1,5 +1,14 @@
 delay = (ms, func) -> setTimeout func, ms
 
+statuses = ['In Development', 'Pre-Production','Filming',
+            'Post-Production', 'Completed']
+
+genres = ['Action','Adventure','Animation','Biography/Biopic',
+          'Comedy','Crime','Documentary','Drama','Experimental',
+          'Family','Fantasy','Film Noir','History','Horror',
+          'Martial Arts','Musical','Mystery','Romance',
+          'Science Fiction','Sports','Thriller','War']
+
 angular.module("data", ["ngResource"]).factory "Event", ($resource) ->
   Event = $resource("/data/events/:id", {}
   ,
@@ -73,13 +82,9 @@ AddTitleCntl = ($scope, $location, $routeParams, Project) ->
   $scope.name = "AddTitleCntl"
   $scope.params = $routeParams
   $scope.$parent.crumblinks = $scope.$parent.breadcrumb()
-  $scope.statuses = ['In Development', 'Pre-Production','Filming',
-                     'Post-Production', 'Completed']
-  $scope.genres = ['Action','Adventure','Animation','Biography/Biopic',
-                    'Comedy','Crime','Documentary','Drama','Experimental',
-                    'Family','Fantasy','Film Noir','History','Horror',
-                    'Martial Arts','Musical','Mystery','Romance',
-                    'Science Fiction','Sports','Thriller','War']
+  $scope.statuses = statuses
+  $scope.genres = genres
+
   $scope.addWriter = ->
     if $scope.project.writers?
       $scope.project.writers.push $scope.project.writeradd
@@ -115,7 +120,22 @@ BrowseCntl = ($scope, $routeParams, $resource) ->
   $scope.params = $routeParams
   $scope.$parent.crumblinks = $scope.$parent.breadcrumb()
   Project = $resource "/data/projects"
-  $scope.projects = Project.query( { }, ->  )
+  $scope.projects = Project.query {}, ->
+  $scope.statusesx = statuses
+  Source = $resource "/data/sources"
+  $scope.sources = Source.query {}, ->
+  $scope.genres = genres
+
+  $scope.filter = () ->
+    data = {}
+    if $scope.filterStatus?
+      data.status = $scope.filterStatus
+    if $scope.filterSource?
+      data.source = $scope.filterSource.name
+    if $scope.filterGenre?
+      data.genre = $scope.filterGenre
+    str = JSON.stringify data
+    $scope.projects = Project.query( { filter: str }, ->  )
 
 ListCntl = ($scope, Event) ->
   $scope.events = Event.query()
