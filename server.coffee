@@ -251,6 +251,18 @@ app.get '/logout', (req, res) ->
   console.log 'redirecting 1'
   res.redirect '/login.html'
 
+app.post '/forgot', (req, res) ->
+  auth.resetPassword req.body.user
+  res.end """
+    <html>
+    <head><title></title></head><body>
+    Password reset and sent to email address.  
+    Redirecting to login page...
+    <script>setTimeout(function() { window.location.href="/login.html"; }, 2000);
+    </script>
+    </body></html>
+  """
+
 app.get '*', (req, res, next) ->  
   console.log req.path
   if not req.session?.user?
