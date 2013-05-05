@@ -1,4 +1,4 @@
-<form name="projectForm" class="high1">
+<form name="projectForm" class="high1 cent1">
 <h2>Add Title</h2>
 
   <div class="control-group" ng-class="{error: projectForm.title.$invalid}">
@@ -28,7 +28,9 @@
   <input type="text" name="director" ng-model="project.director">
 
   <label>Opportunity Source</label>
-  <input type="text" name="source" ng-model="project.source">
+  <select ng-model="project.source">
+      <option ng-repeat="source in oppsources" value="{{source.name}}">{{source.name}}</option>
+  </select>
 
   <label>Cast</label>
     <li ng-repeat="item in project.cast">{{item}}&nbsp;<a ng-click="deleteCast($index)">x</a></li>

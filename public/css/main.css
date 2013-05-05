@@ -29,8 +29,8 @@ li {
   list-style-type: none;
 }
 
-.search {
-
+input.search {
+  width: 100px;
 }
 
 .head {
@@ -170,4 +170,8 @@ select.filter {
 
 label.filter {
   display: inline-block;
+}
+
+.cent1 {
+  padding-left: 50px;
 }

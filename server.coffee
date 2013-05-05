@@ -1,10 +1,13 @@
 express = require 'express'
+MemoryStore = express.session.MemoryStore
+
 fs = require 'fs'
 Mongolian = require 'mongolian'
 server = new Mongolian
 db = server.db 'scriptdb'
 feedParser = require 'feedparser'
 dateFormat = require 'dateformat'
+auth = require './auth'
 
 ObjectId = Mongolian.ObjectId
 ObjectId.prototype.toJSON = ->
@@ -29,6 +32,14 @@ app = express()
 app.use express.static('public')
 app.use express.bodyParser()
 app.use express.methodOverride()
+app.use express.cookieParser()
+
+sessionopts = 
+  store: new MemoryStore()
+  secret: 'secret'
+  key: 'bla'
+
+app.use express.session(sessionopts)
 
 
 html = fs.readFileSync 'index.html', 'utf8'
@@ -58,11 +69,66 @@ app.post '/data/events', (req, res) ->
   events.insert req.body
   res.end('1')
 
+
+#--users
+users = db.collection 'users'
+
+opportunity = db.collection 'opportunity'
+
+app.get '/data/users/:name', (req, res) ->
+  user = auth.find req.params.name
+  console.log 'name is ' + req.params.name
+  console.log 'user at name is'
+  console.log user
+  res.end JSON.stringify(user)
+
+app.delete '/data/users/:id', (req, res) ->
+  ids = { _id: req.params.id }
+  convertids ids
+  #events.remove ids, (err, ev) ->
+  #  res.end '1'
+
+app.put '/data/users/:id', (req, res) ->
+  console.log 'put user'
+  console.log req
+  data = 
+    name: req.body.name
+    email: req.body.email
+    pass: req.body.password
+    realname: req.body.realname
+    permissions: req.body.permissions  
+  auth.update data, (err) ->
+    res.end('1')
+
+app.post '/data/users', (req, res) ->
+  console.log 'user posted'
+  data = 
+    name: req.body.name
+    email: req.body.email
+    pass: req.body.password
+    realname: req.body.realname
+    permissions: req.body.permissions
+  auth.addNoEmail data
+  res.end('1')
+
+app.get '/data/users', (req, res) ->
+  console.log 'get users list'
+  console.log auth.getUsers()
+  res.end JSON.stringify(auth.getUsers())
+
+#-- /users
+
+app.get '/sessiondata', (req, res) ->
+  console.log req.session
+  user = auth.find req.session.user
+  console.log 'sessiondata returning'
+  console.log user
+  res.end JSON.stringify(user)
+
 projects = db.collection 'projects'
 
 app.get '/data/sources', (req, res) ->
   projects.distinct 'source', (err, arr) ->
-    console.log JSON.stringify(arr)
     ret = []
     for source in arr
       ret.push { name: source }
@@ -75,6 +141,42 @@ app.get '/data/statuses', (req, res) ->
 app.get '/data/genres', (req, res) ->
   projects.distinct('genre').toArray (e, arr) ->
     res.end JSON.stringify(arr)
+
+
+#-- opportunity
+
+app.get '/data/opportunity', (req, res) ->
+  if req.query.filter?
+    filter = JSON.parse req.query.filter
+    opportunity.find(filter).toArray (e, arr) ->
+      res.end JSON.stringify(arr)
+  else
+    opportunity.find().toArray (e, arr) ->
+      res.end JSON.stringify(arr)
+
+app.get '/data/opportunity/:id', (req, res) ->
+  convertids req.params
+  opportunity.findOne {_id: req.params._id}, (err, ev) ->
+    res.end JSON.stringify(ev)
+
+app.delete '/data/opportunity/:id', (req, res) ->
+  ids = { _id: req.params.id }
+  convertids ids
+  opportunity.remove ids, (err, ev) ->
+    res.end '1'
+
+app.put '/data/opportunity/:id', (req, res) ->
+  console.log '-- put opp'
+  ids = { _id : req.params.id }
+  convertids ids
+  opportunity.update ids, req.body, (err) ->
+    res.end('1')
+
+app.post '/data/opportunity', (req, res) ->
+  opportunity.insert req.body
+  res.end('1')
+
+#/opportunity
 
 app.get '/data/projects', (req, res) ->
   if req.query.filter?
@@ -134,9 +236,27 @@ app.get "/upcoming", (req, res) ->
       ev.date = dateFormat ev.date, 'shortDate'
     res.end JSON.stringify(arr)
 
-app.get '*', (req, res, next) ->
+app.post '/dologin', (req, res) ->
+  console.log 'do login'
+  if not auth.checkPassword(req.body.user, req.body.password)
+    res.end "Bad login.  Go back to try again."
+  else
+    req.session.user = req.body.user
+    console.log 'redirecting'
+    res.redirect '/'
+
+app.get '/logout', (req, res) ->
+  console.log 'LOGOUT'
+  req.session.user = ''
+  console.log 'redirecting 1'
+  res.redirect '/login.html'
+
+app.get '*', (req, res, next) ->  
   console.log req.path
-  res.end html
+  if not req.session?.user?
+    res.redirect '/login.html'
+  else
+    res.end html
 
 process.on 'uncaughtException', (err) ->
   console.log 'Uncaught exception:'

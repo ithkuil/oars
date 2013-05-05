@@ -1,0 +1,42 @@
+<form name="oppForm" class="high1 cent1">
+<h2>Opportunity</h2>
+
+  <div class="control-group" ng-class="{error: oppForm.name.$invalid}">
+    <label>Name of Opportunity</label>
+    <input type="text"  name="description" ng-model="opp.name" required>
+    <span ng-show="oppForm.name.$error.required" class="help-inline">
+        Required</span>
+  </div>
+
+  <label>Type of Opportunity</label>
+  <select ng-model="opp.type">
+      <option ng-repeat="type in opptypes" value="{{type}}">{{type}}</option>
+  </select>
+
+  <div>
+    <h3>Contact Information</h3>
+    <div class="control-group" ng-class="{error: oppForm.contactname.$invalid}">
+      <label>Contact Name</label>
+      <input type="text"  name="contactname" ng-model="opp.contactname" >
+      <span ng-show="oppForm.contactname.$error.required" class="help-inline">
+          Required</span>
+    </div>
+
+    <div class="control-group" ng-class="{error: oppForm.contactemail.$invalid}">
+      <label>Contact Email</label>
+      <input type="email"  name="contactemail" ng-model="opp.contactemail" >
+      <span ng-show="oppForm.contactemail.$error.required" class="help-inline">
+          Required</span>
+    </div>
+
+  </div>
+
+  <br>
+  <a href="#/" class="btn">Cancel</a>
+  <button ng-click="save()" ng-disabled="isClean() || oppForm.$invalid"
+          class="btn btn-primary">Save</button>
+  <button ng-click="destroy()"
+          ng-show="opp._id" class="btn btn-danger">Delete</button>
+</form>
+
+</div>

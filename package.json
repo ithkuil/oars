@@ -5,7 +5,10 @@
     "express": "",
     "mongolian": "",
     "feedparser": "",
-    "dateformat": ""
+    "dateformat": "",
+    "password-hash": "",
+    "randpass": "",
+    "nodemailer":""
   }
 
 }

@@ -1,0 +1,11 @@
+<div class="thirteen columns high1 cent1">
+  <h4>Users</h4>
+    
+  <li class="users" ng-repeat="user in users">
+    <h5><a href="/settings/user/edit/{{user.name}}">{{user.realname}}</a></h5>
+    <div class="part1"><span>Name:</span> {{user.name}}</div>
+    <div class="part1"><span>Email:</span> {{user.email}}</div>
+    <div class="part1"><span>Permissions:</span> Opportunities = {{user.permissions.opportunities}}</div>
+    <p>&nbsp;</p>
+  </li>
+</div>

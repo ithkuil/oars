@@ -3,13 +3,21 @@ delay = (ms, func) -> setTimeout func, ms
 statuses = ['In Development', 'Pre-Production','Filming',
             'Post-Production', 'Completed']
 
+opptypes = ['Agent/Manager', 'Distributor', 'Film Commission',
+            'Film Festival', 'Film Market', 
+            'Filmmaker/Screenwriter (Solicited Submission)',
+            'Filmmaker/Screenwriter (Unsolicited Submission)',
+            'Producer/Production Company',
+            'Sales Agent, Domestic',
+            'Sales Agent, International', 'Other']
+
 genres = ['Action','Adventure','Animation','Biography/Biopic',
           'Comedy','Crime','Documentary','Drama','Experimental',
           'Family','Fantasy','Film Noir','History','Horror',
           'Martial Arts','Musical','Mystery','Romance',
           'Science Fiction','Sports','Thriller','War']
 
-angular.module("data", ["ngResource"]).factory "Event", ($resource) ->
+angular.module("dataevent", ["ngResource"]).factory "Event", ($resource) ->
   Event = $resource("/data/events/:id", {}
   ,
     update:
@@ -29,7 +37,49 @@ angular.module("data", ["ngResource"]).factory "Event", ($resource) ->
 
   Event
 
-angular.module("data", ["ngResource"]).factory "Project", ($resource) ->
+angular.module("datauser", ["ngResource"]).factory "User", ($resource) ->
+  User = $resource("/data/users/:id", {}
+  ,
+    update:
+      method: "PUT"
+  )
+  User::update = (cb) ->
+    User.update
+      id: @name #@_id.$oid
+    , angular.extend({}, this,
+      _id: `undefined`
+    ), cb
+
+  User::destroy = (cb) ->
+    User.remove
+      id: @name
+    , cb
+
+  User
+
+
+angular.module("dataopp", ["ngResource"]).factory "Opportunity", ($resource) ->
+  Opportunity = $resource("/data/opportunity/:id", {}
+  ,
+    update:
+      method: "PUT"
+  )
+  Opportunity::update = (cb) ->
+    Opportunity.update
+      id: @_id #@_id.$oid
+    , angular.extend({}, this,
+      _id: `undefined`
+    ), cb
+
+  Opportunity::destroy = (cb) ->
+    Opportunity.remove
+      id: @_id
+    , cb
+
+  Opportunity
+
+
+angular.module("dataproject", ["ngResource"]).factory "Project", ($resource) ->
   Project = $resource("/data/projects/:id", {}
   ,
     update:
@@ -49,13 +99,23 @@ angular.module("data", ["ngResource"]).factory "Project", ($resource) ->
 
   Project
 
-window.MainCntl = ($scope, $route, $routeParams, $location, $http) ->
+window.MainCntl = ($scope, $route, $routeParams, $location, $resource, $http) ->
   $scope.$route = $route
   $scope.$location = $location
   $scope.$routeParams = $routeParams
   $scope.crumbs = [ '/opp/addtitle=Add Title', '/opp/dash=Dashboard',
-                    '/opp/settings=Settings','/opp/Settings=Settings',
+                    '/opp/settings=Settings', '/opp/settings/adduser=Add User', 
                     '/opp/browse=Browse Titles','/opp=Opportunities', '/=OARS' ]
+
+  UserData = $resource "/sessiondata"
+  $scope.sessionInfo = UserData.get {}, (data) ->
+    console.log 'sessionInfo is'
+    console.log $scope.sessionInfo
+    console.log 'data is '    
+    console.log JSON.stringify(data)
+    $scope.showaddtitle = $scope.sessionInfo.permissions.opportunities is 'readwrite'
+
+  $scope.showView = true
   $scope.breadcrumb = ->
     path = $scope.$location.path()
     parts = []
@@ -77,13 +137,28 @@ DashCntl = ($scope, $routeParams, $resource) ->
   $scope.name = "DashCntl"
   $scope.params = $routeParams
   $scope.$parent.crumblinks = $scope.$parent.breadcrumb()
+  console.log $scope.$parent.sessionInfo
+  $scope.$parent.showView = $scope.$parent.sessionInfo.permissions.opportunities isnt 'none'
 
-AddTitleCntl = ($scope, $location, $routeParams, Project) ->
+AddOpportunityCntl = ($scope, $location, $routeParams, Opportunity) ->
+  $scope.name = "AddOpportunityCntl"
+  $scope.params = $routeParams
+  $scope.$parent.crumblinks = $scope.$parent.breadcrumb()
+  $scope.$parent.showView = $scope.$parent.sessionInfo.permissions.opportunities is 'readwrite'
+  $scope.opptypes = opptypes
+  $scope.save = ->
+    Opportunity.save $scope.opp, (project) ->
+      $location.path "/opp/browse"
+
+AddTitleCntl = ($scope, $location, $routeParams, $resource, Project) ->
   $scope.name = "AddTitleCntl"
   $scope.params = $routeParams
   $scope.$parent.crumblinks = $scope.$parent.breadcrumb()
+  $scope.$parent.showView = $scope.$parent.sessionInfo.permissions.opportunities is 'readwrite'
   $scope.statuses = statuses
   $scope.genres = genres
+  Opps = $resource "/data/opportunity"
+  $scope.oppsources = Opps.query {}, ->
 
   $scope.addWriter = ->
     if $scope.project.writers?
@@ -110,15 +185,28 @@ AddTitleCntl = ($scope, $location, $routeParams, Project) ->
     Project.save $scope.project, (project) ->
       $location.path "/opp/browse"
 
-SettingsCntl = ($scope, $routeParams) ->
+SettingsCntl = ($scope, $routeParams, $resource) ->
   $scope.name = "SettingsCntl"
   $scope.params = $routeParams
   $scope.$parent.crumblinks = $scope.$parent.breadcrumb()
+  $scope.showadduser = $scope.$parent.sessionInfo.name is 'admin'
+  $scope.showlistusers = $scope.$parent.sessionInfo.name is 'admin'
+  $scope.showaddevent = $scope.$parent.sessionInfo.permissions.opportunities is 'readwrite'
+  $scope.showaddopp = $scope.$parent.sessionInfo.permissions.opportunities is 'readwrite'  
+  $scope.$parent.showView = $scope.$parent.sessionInfo.permissions.opportunities isnt 'none'
+
+ListUsersCntl = ($scope, $routeParams, $resource) ->
+  $scope.name = "UserListCntl"
+  $scope.params = $routeParams
+  $scope.$parent.crumblinks = $scope.$parent.breadcrumb()
+  UserList = $resource "/data/users"
+  $scope.users = UserList.query {}, ->
 
 BrowseCntl = ($scope, $routeParams, $resource) ->
   $scope.name = "BrowseCntl"
   $scope.params = $routeParams
   $scope.$parent.crumblinks = $scope.$parent.breadcrumb()
+  $scope.$parent.showView = $scope.$parent.sessionInfo.permissions.opportunities isnt 'none'
   Project = $resource "/data/projects"
   $scope.projects = Project.query {}, ->
   $scope.statusesx = statuses
@@ -145,6 +233,11 @@ NewEventCntl = ($scope, $location, Event) ->
     Event.save $scope.event, (event) ->
       $location.path "/opp/settings"
 
+NewUserCntl = ($scope, $location, User) ->
+  $scope.save = ->
+    User.save $scope.user, (user) ->
+      $location.path "/opp/settings"      
+
 removeWriter = (scope, idx) ->
   scope.project.writers.splice idx, 1
 
@@ -167,6 +260,25 @@ EditProjectCntl = ($scope, $location, $routeParams, Project) ->
     $scope.project.update ->
       $location.path "/opp/settings"
 
+EditUserCntl = ($scope, $location, $routeParams, $resource, User) ->
+  self = this
+  User.get
+    id: $routeParams.userId
+  , (user) ->    
+    self.original = user   
+    $scope.showpermissions = $scope.$parent.sessionInfo.name is 'admin'
+    $scope.user = new User(self.original)
+
+  $scope.isClean = ->
+    angular.equals self.original, $scope.event
+
+  $scope.destroy = ->
+    self.original.destroy ->
+      $location.path "/settings/listusers"
+
+  $scope.save = ->
+    $scope.user.update ->
+      $location.path "/settings/listusers"
 
 EditEventCntl = ($scope, $location, $routeParams, Event) ->
   self = this
@@ -175,6 +287,9 @@ EditEventCntl = ($scope, $location, $routeParams, Event) ->
   , (event) ->
     event.date = new Date(event.date)
     self.original = event
+    $scope.$parent.showView = $scope.$parent.sessionInfo.permissions.opportunities is 'readwrite'
+    console.log 'inside editeventcntl sessioninfo is'
+    console.log $scope.$parent.sessionInfo    
     $scope.event = new Event(self.original)
 
   $scope.isClean = ->
@@ -197,9 +312,11 @@ mod = ($routeProvider, $locationProvider) ->
     templateUrl: "/dash.html"
     controller: DashCntl
 
+  
   $routeProvider.when "/opp/addtitle",
     templateUrl: "/addtitle.html"
     controller: AddTitleCntl
+  
 
   $routeProvider.when "/opp/settings",
     templateUrl: "/settings.html"
@@ -212,6 +329,22 @@ mod = ($routeProvider, $locationProvider) ->
   $routeProvider.when "/opp/event/new",
     templateUrl: "/eventdetail.html"
     controller: NewEventCntl
+  
+  $routeProvider.when "/settings/adduser",
+    templateUrl: "/adduser.html"
+    controller: NewUserCntl
+
+  $routeProvider.when "/settings/addopportunity",
+    templateUrl: "/addopportunity.html"
+    controller: AddOpportunityCntl            
+
+  $routeProvider.when "/settings/user/edit/:userId",
+    templateUrl: "/adduser.html"
+    controller: EditUserCntl      
+
+  $routeProvider.when "/settings/listusers",
+    templateUrl: "/users.html"
+    controller: ListUsersCntl      
 
   $routeProvider.when "/opp/project/edit/:projectId",
     templateUrl: "/addtitle.html"
@@ -223,7 +356,8 @@ mod = ($routeProvider, $locationProvider) ->
 
   $locationProvider.html5Mode true
 
-viewMod = angular.module "ngView", [ "ngResource", "data", "ui" ], mod
+viewMod = angular.module "ngView", [ "ngResource", "dataproject", "dataopp"
+                                     "dataevent", "datauser", "ui" ], mod
 
 viewMod.directive "listentry", ($resource) ->
   restrict: "E"

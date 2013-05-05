@@ -57,24 +57,25 @@
       <div ng-controller="MainCntl" id="mainctl">
         <div class="head high1 sixteen columns">
           <div class="eleven columns">
+            <span>{{sessionInfo.name}}</span>&nbsp;&nbsp;
             <span ng-repeat="crumb in crumblinks">
               <span class="sep{{$index}}">|</span>
               <a ng-class="" href="{{crumb.path}}">{{crumb.name}}</a>
             </span>
           </div>
-          <div class="search one columns">
-           <input class="search"/>
+          <div class="search three columns">
+           <input class="search"/> &nbsp;&nbsp;<a href="#" onclick="window.location.href='/logout'">logout</a>
           </div>
         </div>
         <div class="navleft two columns high1" ng-show="$location.path() != '/'">
           <ul>
             <li><a href="/opp/dash">Dashboard</a></li>
-            <li><a href="/opp/addtitle">Add Title</a></li>
+            <li ng-show="showaddtitle"><a href="/opp/addtitle">Add Title</a></li>
             <li><a href="/opp/browse">Browse Titles</a></li>
             <li><a href="/opp/settings">Settings</a></li>
           </ul>
         </div>
-        <div ng-view class="thirteen columns"></div>
+        <div ng-view class="thirteen columns" ng-show="showView"></div>
       </div>
     </article>
   </body>

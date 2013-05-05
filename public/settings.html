@@ -1,4 +1,10 @@
-<div class="high1">
-  <h2>Settings</h2>
-  <a href="/opp/event/new">Add Event</a>
+<div class="high1 cent1">
+  <h3>Events</h3>
+  <a href="/opp/event/new" ng-show="showaddevent">Add Event</a>
+  <h3>Users</h3>
+  <p><a href="/settings/adduser" ng-show="showadduser">Add User</a></p>
+  <p><a href="/settings/user/edit/{{sessionInfo.name}}">My User Account</a></p>
+  <p><a href="/settings/listusers" ng-show="showlistusers">List/edit Users</a></p>
+  <h3>Opportunities</h3>
+  <a href="/settings/addopportunity" ng-show="showaddopp">Add Opportunity</a></p>
 </div>

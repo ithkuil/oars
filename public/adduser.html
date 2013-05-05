@@ -1,0 +1,50 @@
+<form name="userForm" class="high1 cent1">
+<h2>User</h2>
+
+  <div class="control-group" ng-class="{error: userForm.name.$invalid}">
+    <label>Username</label>
+    <input type="text"  name="name" ng-model="user.name" required>
+    <span ng-show="userForm.name.$error.required" class="help-inline">
+        Required</span>
+  </div>
+
+  <div class="control-group" ng-class="{error: userForm.realname.$invalid}">
+    <label>Name</label>
+    <input type="text"  name="realname" ng-model="user.realname" required>
+    <span ng-show="userForm.realname.$error.required" class="help-inline">
+        Required</span>
+  </div>
+
+
+  <div class="control-group" ng-class="{error: userForm.email.$invalid}">
+    <label>Email</label>
+    <input type="email"  name="email" ng-model="user.email" required>
+    <span ng-show="userForm.email.$error.required" class="help-inline">
+        Required</span>
+  </div>
+
+  <div class="control-group" ng-class="{error: userForm.password.$invalid}">
+    <label>Password</label>
+    <input type="password"  name="password" ng-model="user.password" required>
+    <span ng-show="userForm.password.$error.required" class="help-inline">
+        Required</span>
+  </div>
+
+  <div class="control-group" >
+    <h4>User Permissions</h4>
+    <label>Opportunities</label>
+    <input type="radio" ng-model="user.permissions.opportunities" value="read" />&nbsp;read &nbsp;&nbsp;
+    <input type="radio" ng-model="user.permissions.opportunities" value="readwrite" />&nbsp;read/write&nbsp;&nbsp;
+    <input type="radio" ng-model="user.permissions.opportunities" value="none" />&nbsp;none<br />  
+  </div>
+
+
+  <br>
+  <a href="#/" class="btn">Cancel</a>
+  <button ng-click="save()" ng-disabled="isClean() || userForm.$invalid"
+          class="btn btn-primary">Save</button>
+  <button ng-click="destroy()"
+          ng-show="user._id" class="btn btn-danger">Delete</button>
+</form>
+
+</div>
