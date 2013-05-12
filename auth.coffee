@@ -132,6 +132,22 @@ update = (data, cb) =>
   save()
   cb?()
 
+sendMail = (data, cb) ->
+  options =
+    from: 'oars <root@oarsmanagement.com>'
+    to: data.to
+    subject: data.subject
+    text: data.text
+    html: data.html
+  smtp.sendMail options, (err, res) ->
+    if err?
+      console.log err
+      cb err
+    else
+      console.log 'Message sent: ' + res.message  
+      cb null, true
+
+
 exports.add = add
 exports.resetPassword = resetPassword
 exports.updatePassword = updatePassword
@@ -142,5 +158,5 @@ exports.users = users
 exports.getUsers = getUsers
 exports.update = update
 exports.find = find
-
+exports.sendMail = sendMail
 

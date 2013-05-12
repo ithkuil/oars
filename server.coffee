@@ -1,5 +1,6 @@
 express = require 'express'
 MemoryStore = express.session.MemoryStore
+prettyjson = require 'prettyjson'
 
 fs = require 'fs'
 Mongolian = require 'mongolian'
@@ -207,8 +208,50 @@ app.put '/data/projects/:id', (req, res) ->
     res.end('1')
 
 app.post '/data/projects', (req, res) ->
+  console.log 'post = insert project'
   projects.insert req.body
   res.end('1')
+
+app.post '/data/reviews/add/:projectid', (req, res) ->
+  console.log 'add review'
+  ids = { _id : req.params.projectid }
+  convertids ids
+  projects.findOne ids, (err, project) ->
+    if err?
+      console.log err
+      res.end err.message
+    else
+      console.log project
+      if not project.reviews?
+        project.review = []
+      project.reviews.push req.body
+    projects.update ids, project
+    res.end '1'
+
+convertAnsi = (text) ->
+  Convert = require 'ansi-to-html'
+  convert = new Convert()
+  text = text.replace /\n/g, '<br/>'
+  htmlx = convert.toHtml text
+  htmlx = '<div style="padding: 20px; background: #111;"">' + htmlx + '</div>'
+  htmlx
+
+app.post '/sendreview/:email', (req, res) ->
+  console.log 'Send review'
+  ansi = prettyjson.render req.body
+  console.log ansi
+  html = convertAnsi ansi
+
+  opts =
+    to: req.params.email
+    subject: 'review'
+    text: html
+    html: html
+  auth.sendMail opts, (err, success) ->
+    if err?      
+      res.end 'error'
+    else
+      res.end 'ok'
 
 
 getFeed = (url, cb) ->
@@ -275,4 +318,5 @@ process.on 'uncaughtException', (err) ->
   console.log err
   console.log err.stack
 
+console.log "Port 8090"
 app.listen 8090

@@ -175,3 +175,65 @@ label.filter {
 .cent1 {
   padding-left: 50px;
 }
+
+.modal-body {
+  background-color: rgb(51,51,51);
+  color: rgb(207, 207, 207);
+}
+
+.modal-header {
+  background-color: rgb(61,61,61);
+}
+
+.modal-footer {
+  background-color: rgb(66,66,66);
+}
+
+td.tlabel {
+  text-align: right;
+  padding-right: 20px;
+  vertical-align: top;
+  font-weight: bold;
+}
+
+td.tlabel2 {
+  text-align: right;
+  padding-left: 20px;
+  padding-right: 20px;
+  vertical-align: top;
+  font-weight: bold; 
+  min-width: 35%;
+}
+
+.rating span {
+  background-color: rgb(200,200,200);
+}
+
+.logline, .reviewcomments, .reviewcomments2, .reviewsynopsis {
+  width: 70%;
+}
+
+.prevreview {
+  float: left;
+}
+
+.nextreview {
+  float: right;
+}
+
+.modal.fade.in {
+  top: 5%;
+}
+
+.modal-footer {
+  text-align: center;
+}
+
+.editreview {
+  float: left;
+  font-size: 16pt;
+}
+
+.sendit {
+  text-align: center;
+}

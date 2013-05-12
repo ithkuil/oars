@@ -179,11 +179,28 @@ AddTitleCntl = ($scope, $location, $routeParams, $resource, Project) ->
   $scope.delete = (idx) ->
     removeWriter $scope, idx
   $scope.save = ->
-    $scope.project.reviews = []
+    if not $scope.project.reviews?
+      $scope.project.reviews = []
     $scope.project.files = []
     $scope.project.projections = []
     Project.save $scope.project, (project) ->
       $location.path "/opp/browse"
+
+ReviewsCtrl = ($scope) ->
+
+  $scope.open = ->
+    $scope.shouldBeOpen = true
+
+  $scope.saveReview = ->
+    $scope.closeMsg = 'I was closed at: ' + new Date()
+    $scope.shouldBeOpen = false;
+    alert 'savereview'
+
+  $scope.items = ['item1', 'item2']
+
+  $scope.opts =
+    backdropFade: true
+    dialogFade:true
 
 SettingsCntl = ($scope, $routeParams, $resource) ->
   $scope.name = "SettingsCntl"
@@ -202,17 +219,106 @@ ListUsersCntl = ($scope, $routeParams, $resource) ->
   UserList = $resource "/data/users"
   $scope.users = UserList.query {}, ->
 
-BrowseCntl = ($scope, $routeParams, $resource) ->
+BrowseCntl = ($scope, $routeParams, $resource, Project, $location) ->
   $scope.name = "BrowseCntl"
   $scope.params = $routeParams
   $scope.$parent.crumblinks = $scope.$parent.breadcrumb()
   $scope.$parent.showView = $scope.$parent.sessionInfo.permissions.opportunities isnt 'none'
-  Project = $resource "/data/projects"
-  $scope.projects = Project.query {}, ->
+  ProjectX = $resource "/data/projects"
+  $scope.projects = ProjectX.query {}, ->
   $scope.statusesx = statuses
   Source = $resource "/data/sources"
   $scope.sources = Source.query {}, ->
   $scope.genres = genres
+
+  $scope.closeViewOrAddReview = ->
+    $scope.viewOrAdd = false
+
+  $scope.readReviews = ->
+    $scope.reviewNum = 0
+    $scope.viewOrAdd = false
+    $scope.viewMode = true
+    $scope.review = $scope.project.reviews[0]
+    $scope.editableReview = true
+    $scope.shouldBeOpen = true    
+
+  $scope.addReview = (project) ->
+    $scope.reviewCount = $scope.project.reviews.length
+    $scope.addingReview = true
+    $scope.editableReview = false
+    $scope.project = project
+    $scope.viewOrAdd = false
+    $scope.review =
+      title: project.title
+      writers: project.writers
+      directors: project.directors
+      status: project.status
+      timestamp: new Date()
+      rating: 0
+    project.reviews.push $scope.review
+    $scope.shouldBeOpen = true
+
+  $scope.editReview = ->
+    $scope.viewMode = false
+    $scope.addingReview = false
+    $scope.editableReview = false
+
+  $scope.addViewReviews = (project) ->
+    $scope.project = project
+    $scope.viewOrAdd = false
+    $('.modal-backdrop').show()
+    if not project.reviews? or project.reviews?.length is 0
+      project.reviews = []
+      $scope.addReview project
+    else
+      $scope.shouldBeOpen = false
+      $scope.viewOrAdd = true
+
+  $scope.saveReview = ->
+    console.log JSON.stringify($scope.project)
+    ReviewAdder = $resource "/data/reviews/add/#{$scope.project._id}"
+    ReviewAdder.save $scope.review, ->
+      $scope.shouldBeOpen = false
+      $location.path "/opp/browse"
+
+  $scope.sendReview = ->
+    email = prompt "Email address to send review to:"
+    ReviewSender = $resource "/sendreview/#{email}"
+    ReviewSender.save $scope.review, ->
+      alert 'Review sent'      
+
+  $scope.nextReview = ->
+    if $scope.reviewNum < $scope.project.reviews.length-1
+      $scope.reviewNum += 1
+      $scope.review = $scope.project.reviews[$scope.reviewNum]
+
+  $scope.previousReview = ->
+    if $scope.reviewNum > 0
+      $scope.reviewNum -= 1
+      $scope.review = $scope.project.reviews[$scope.reviewNum]
+
+  $scope.save = ->
+    if not $scope.project.reviews?
+      $scope.project.reviews = []
+    $scope.project.files = []
+    $scope.project.projections = []
+    project.reviews.push $scope.review
+    $scope.viewMode = false
+    Project.save $scope.project, (project) ->
+      $location.path "/opp/browse"
+
+  $scope.close = (cancelled) ->
+    if cancelled and $scope.addingReview
+      if $scope.project.reviews.length > $scope.reviewCount
+        $scope.project.reviews.pop()
+    $scope.shouldBeOpen = false
+    $scope.viewOrAdd = false
+    $scope.viewMode = false
+    $('.modal-backdrop').hide()
+
+  $scope.opts =
+    backdropFade: true
+    dialogFade:true
 
   $scope.filter = () ->
     data = {}
@@ -357,7 +463,8 @@ mod = ($routeProvider, $locationProvider) ->
   $locationProvider.html5Mode true
 
 viewMod = angular.module "ngView", [ "ngResource", "dataproject", "dataopp"
-                                     "dataevent", "datauser", "ui" ], mod
+                                     "dataevent", "datauser", "ui",
+                                     "ui.bootstrap" ], mod
 
 viewMod.directive "listentry", ($resource) ->
   restrict: "E"
@@ -402,6 +509,7 @@ viewMod.directive "upcoming", ($resource) ->
     scope.evts = Upcoming.query( { blah: 'hello' }, ->  )
     scope.$on
 
+
 viewMod.directive 'tabs', ->
   restrict: 'E'
   transclude: true
@@ -430,6 +538,7 @@ viewMod.directive 'tabs', ->
     """
   replace: true
 
+
 viewMod.directive 'pane', ->
   require: '^tabs'
   restrict: 'E'
@@ -442,3 +551,4 @@ viewMod.directive 'pane', ->
     '<div class="tab-pane" ng-class="{active: selected}" ng-show="selected" ng-transclude>' +
     '</div>'
   replace: true
+

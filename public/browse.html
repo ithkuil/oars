@@ -6,7 +6,7 @@
 
   <label class="filter">Genre:</label><select class="filter" ng-model="filterGenre" ng-options="genre for genre in genres" ng-change="filter()"><option ng-selected="selected"></option></select>
 
-    <br>
+  <br>
   <li class="project" ng-repeat="project in projects">
     <h5>{{project.title}}</h5>
     <div class="part1"><label>Status:</label><span class="cardtext">{{project.status}}</span></div>
@@ -18,8 +18,86 @@
     <div class="part1"><label>Genre:</label><span class="cardtext">{{project.genre}}</span></div>
     <div class="part1"><label>Budget:</label><span class="cardtext">{{project.budget}}</span></div>
     <div class="part1"><label><a href="{{project.imdb}}" target="_blank">IMDB</a></label></div>
-    <div class="attached">Add/View<br>{{project.reviews.length}} Reviews</div>
+    <a href="#" ng-click="addViewReviews(project)"><div class="attached">Add/View<br>{{project.reviews.length}} Reviews</div></a>
     <div class="attached">Add/View<br>{{project.projections.length}} Projections</div>
     <div class="attached">Add/View<br>{{project.projections.length}} Files</div>
   </li>
+</div>
+
+<div modal="shouldBeOpen" close="close()" options="opts">
+  <div class="modal-header">
+    <h4>{{review.title}}</h4>
+  </div>
+  <div class="modal-body">
+    <form name="reviewForm" class="high1">
+      <a href="#"><div class="editreview" ng-click="editReview()" ng-show="editableReview">✍</div></a>
+      <table>
+        <tr>
+          <td class="tlabel">Writer(s):</td><td>{{review.writers.join(', ')}}</td>
+          <td class="tlabel2">Director(s):</td><td>{{review.directors.join(', ')}}</td>
+        </tr>
+        <tr>
+          <td class="tlabel">Project Status:</td><td>{{review.status}}</td>
+          <td class="tlabel2">Submitted by:</td><td>{{review.submittedby}}</td>        
+        </tr>
+        <tr>
+          <td class="tlabel">Reviewed by:</td><td>{{review.reviewer}}</td>
+          <td class="tlabel2">Reviewed on:</td><td>{{review.timestamp.toLocaleString()}}</td>
+        </tr>
+        <tr>
+          <td class="tlabel">Logline:</td>
+          <td colspan="3"><textarea ng-disabled="viewMode" name="logline" class="logline" ng-model="review.logline"></textarea>
+        </tr>
+        <tr>
+          <td class="tlabel">Comments<br/>Summary:</td>
+          <td colspan="3"><textarea  ng-disabled="viewMode" name="comments" class="reviewcomments" ng-model="review.summary"></textarea>
+        </tr>
+        <tr>
+          <td class="tlabel">Rating<br/>Summary:</td>
+          <td class="rating" colspan="3"><rating value="review.rating" max="10" readonly="viewMode"></rating></td>
+        </tr>
+        <tr>
+          <td class="tlabel">Project Recommendation:</td>
+          <td colspan="3">
+            <input type="radio" ng-disabled="viewMode" ng-model="review.recommendproject" value="Pass" />&nbsp;Pass &nbsp;&nbsp;
+            <input type="radio"  ng-disabled="viewMode" ng-model="review.recommendproject" value="Consider" />&nbsp;Consider&nbsp;&nbsp;
+            <input type="radio"  ng-disabled="viewMode" ng-model="review.recommendproject" value="Buy" />&nbsp;Buy<br />  
+          </td>
+        </tr>
+        <tr>
+          <td class="tlabel">Synopsis:</td>
+          <td colspan="3"><textarea ng-disabled="viewMode" name="synopsis" class="reviewsynopsis" ng-model="review.synopsis"></textarea>
+        </tr>
+        <tr>
+          <td class="tlabel">Comments:</td>
+          <td colspan="3"><textarea ng-disabled="viewMode" name="comments" class="reviewcomments2" ng-model="review.comments"></textarea>
+        </tr>      
+      </table>
+    </form>
+  </div>
+  <div class="modal-footer">
+    <button ng-click="previousReview()" ng-show="viewMode" class="prevreview">&larr; Previous Review</button>
+    <button ng-click="saveReview()" ng-hide="viewMode" ng-disabled="isClean() || reviewForm.$invalid"
+          class="btn btn-primary">Save</button>
+    <button ng-click="sendReview()" ng-show="viewMode" ng-disabled="isClean() || reviewForm.$invalid"
+          class="btn btn-primary sendit pagination-centered">Send</button>
+
+    <!-- <button ng-click="destroy()" ng-hide="viewMode"
+          ng-show="project._id" class="btn btn-danger">Delete</button> -->
+    <button class="btn btn-warning cancel" ng-hide="viewMode" ng-click="close(true)">Cancel</button>
+    <button ng-click="nextReview()" ng-show="viewMode" class="nextreview">&rarr; Next Review</button>
+  </div>
+</div>
+
+<div modal="viewOrAdd" close="closeViewOrAddReview()" options="opts">
+  <div class="modal-header">
+    <h4>Would you like to..</h4>
+  </div>
+  <div class="modal-body">
+    <button ng-click="addReview(project)" class="btn btn-primary">Add Review</button>
+    <button ng-click="readReviews()" class="btn btn-primary">Read Reviews</button>
+  </div>
+</div>
+
+
 </div>

@@ -8,7 +8,9 @@
     "dateformat": "",
     "password-hash": "",
     "randpass": "",
-    "nodemailer":""
+    "nodemailer":"",
+    "prettyjson":"",
+    "ansi-to-html":""
   }
 
 }
