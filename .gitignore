@@ -3,3 +3,5 @@ nohup.out
 rethinkdb_data
 public/js/script.js
 userdata.json
+public/files
+tmp

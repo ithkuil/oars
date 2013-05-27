@@ -105,7 +105,8 @@ window.MainCntl = ($scope, $route, $routeParams, $location, $resource, $http) ->
   $scope.$routeParams = $routeParams
   $scope.crumbs = [ '/opp/addtitle=Add Title', '/opp/dash=Dashboard',
                     '/opp/settings=Settings', '/opp/settings/adduser=Add User', 
-                    '/opp/browse=Browse Titles','/opp=Opportunities', '/=OARS' ]
+                    '/opp/browse=Browse Titles', 'opp/upscreener=Upload Screener',
+                    '/opp=Opportunities', '/=OARS' ]
 
   UserData = $resource "/sessiondata"
   $scope.sessionInfo = UserData.get {}, (data) ->
@@ -263,6 +264,19 @@ BrowseCntl = ($scope, $routeParams, $resource, Project, $location) ->
     $scope.addingReview = false
     $scope.editableReview = false
 
+
+  $scope.addViewFiles = (project) ->
+    $scope.project = project
+    $scope.viewOrAddFiles = false
+    $('.modal-backdrop').show()
+    $scope.viewOrAddFiles = true
+
+  $scope.addReview = (project) ->
+    $scope.project = project
+    $scope.viewOrAddFiles = false   
+    $scope.uploaderOpen = true
+
+
   $scope.addViewReviews = (project) ->
     $scope.project = project
     $scope.viewOrAdd = false
@@ -386,6 +400,83 @@ EditUserCntl = ($scope, $location, $routeParams, $resource, User) ->
     $scope.user.update ->
       $location.path "/settings/listusers"
 
+UploadScreenerCntl = ($scope, $location, $routeParams, Project) ->
+  self = this
+  Project.get
+    id: $routeParams.projectId
+  , (project) ->    
+    self.original = project
+    $scope.$parent.showView = $scope.$parent.sessionInfo.permissions.opportunities is 'readwrite'
+    $scope.project = new Project(self.original)
+
+    url = '/up'
+
+    uploadButton = $("<button/>").addClass("btn").prop("disabled", true).text("Processing...").on("click", ->
+      $this = $(this)
+      data = $this.data()
+      $this.off("click").text("Abort").on "click", ->
+        $this.remove()
+        data.abort()
+
+      data.submit().always ->
+        $this.remove()
+    )
+
+    $("#fileupload").fileupload(
+      url: url
+      dataType: "json"
+      autoUpload: false
+      acceptFileTypes: /(\.|\/)(mp4|ogv|mpg|avi|mov|wmv|264|3g2|3gp|3gp2|divx|dvx|h264|m4v|m4e|mp4v|mpeg|mpeg4|mpg2|ogm|ogx|qt|swf|vob|webm|xvid)$/i
+      maxFileSize: 15000000000
+      loadImageMaxFileSize: 1500000000
+      disableImageResize: true
+      previewMaxWidth: 100
+      previewMaxHeight: 100
+      previewCrop: true
+    ).on("fileuploadadd", (e, data) ->
+      data.context = $("<div/>").appendTo("#files")
+      $.each data.files, (index, file) ->
+        node = $("<p/>").append($("<span/>").text(file.name))
+        node.append("<br>").append uploadButton.clone(true).data(data)  unless index
+        node.appendTo data.context
+
+    ).on("fileuploadprocessalways", (e, data) ->
+      index = data.index
+      file = data.files[index]
+      node = $(data.context.children()[index])
+      node.prepend("<br>").prepend file.preview  if file.preview and false
+      node.append("<br>").append file.error  if file.error
+      data.context.find("button").text("Upload").prop "disabled", !!data.files.error  if index + 1 is data.files.length
+    ).on("fileuploadprogressall", (e, data) ->
+      progress = parseInt(data.loaded / data.total * 100, 10)
+      $("#progress .bar").css "width", progress + "%"
+    ).on("fileuploaddone", (e, data) ->
+      $.each data.result.files, (index, file) ->
+        link = $("<a>").attr("target", "_blank").prop("href", file.url)
+        $(data.context.children()[index]).wrap link
+        window.location.href = '/opp/browse'
+        #$location.path '/opp/browse'
+
+    ).on "fileuploadfail", (e, data) ->
+      $.each data.result.files, (index, file) ->
+        alert 'error'
+        error = $("<span/>").text(file.error)
+        $(data.context.children()[index]).append("<br>").append error
+
+
+
+  $scope.isClean = ->
+    angular.equals self.original, $scope.project
+
+  $scope.destroy = ->
+    self.original.destroy ->
+      $location.path "/opp/browse"
+
+  $scope.save = ->
+    $scope.project.update ->
+      $location.path "/opp/browse"
+
+
 EditEventCntl = ($scope, $location, $routeParams, Event) ->
   self = this
   Event.get
@@ -459,6 +550,11 @@ mod = ($routeProvider, $locationProvider) ->
   $routeProvider.when "/opp/event/edit/:eventId",
     templateUrl: "/eventdetail.html"
     controller: EditEventCntl
+
+  $routeProvider.when "/opp/upscreener/:projectId",
+    templateUrl: "/upload.html"
+    controller: UploadScreenerCntl
+
 
   $locationProvider.html5Mode true
 

@@ -1,6 +1,10 @@
+require('source-map-support').install()
 express = require 'express'
 MemoryStore = express.session.MemoryStore
+https = require 'https'
+http = require 'http'
 prettyjson = require 'prettyjson'
+uploads = require './uploads'
 
 fs = require 'fs'
 Mongolian = require 'mongolian'
@@ -27,11 +31,15 @@ feeds = {}
 delay = (ms, func) -> setTimeout func, ms
 interval = (ms, func) -> setInterval func, ms
 
-express = require 'express'
 app = express()
 
+options =
+  key: fs.readFileSync 'key.pem'
+  cert: fs.readFileSync 'cert.pem'
+
 app.use express.static('public')
-app.use express.bodyParser()
+app.use(express.json()).use(express.urlencoded())
+#app.use express.bodyParser()
 app.use express.methodOverride()
 app.use express.cookieParser()
 
@@ -42,6 +50,8 @@ sessionopts =
 
 app.use express.session(sessionopts)
 
+https.createServer(options, app).listen(8443)
+console.log "Listening on port 8443"
 
 html = fs.readFileSync 'index.html', 'utf8'
 
@@ -306,6 +316,8 @@ app.post '/forgot', (req, res) ->
     </body></html>
   """
 
+app.all '/up*', uploads.serve
+
 app.get '*', (req, res, next) ->  
   console.log req.path
   if not req.session?.user?
@@ -318,5 +330,5 @@ process.on 'uncaughtException', (err) ->
   console.log err
   console.log err.stack
 
-console.log "Port 8090"
-app.listen 8090
+
+

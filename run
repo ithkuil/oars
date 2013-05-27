@@ -1,4 +1,7 @@
 #!/bin/bash
 npm install
+mkdir tmp
+mkdir public/files
 coffee -c public/js/*.coffee
 coffee server.coffee
+

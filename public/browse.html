@@ -20,7 +20,7 @@
     <div class="part1"><label><a href="{{project.imdb}}" target="_blank">IMDB</a></label></div>
     <a href="#" ng-click="addViewReviews(project)"><div class="attached">Add/View<br>{{project.reviews.length}} Reviews</div></a>
     <div class="attached">Add/View<br>{{project.projections.length}} Projections</div>
-    <div class="attached">Add/View<br>{{project.projections.length}} Files</div>
+    <a href="#" ng-click="addViewFiles(project)"><div class="attached">Add/View<br>{{project.projections.length}} Files</div></a>
   </li>
 </div>
 
@@ -96,6 +96,16 @@
   <div class="modal-body">
     <button ng-click="addReview(project)" class="btn btn-primary">Add Review</button>
     <button ng-click="readReviews()" class="btn btn-primary">Read Reviews</button>
+  </div>
+</div>
+
+<div modal="viewOrAddFiles" close="closeViewOrAddFiles()" options="opts">
+  <div class="modal-header">
+    <h4>Would you like to..</h4>
+  </div>
+  <div class="modal-body">
+    <a href="/opp/upscreener/{{project._id}}" target="_blank" ><button class="btn btn-primary">Upload a Screener</button></a>
+    <button ng-click="uploadScript()" class="btn btn-primary">Upload a Script</button>
   </div>
 </div>
 
