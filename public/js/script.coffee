@@ -333,6 +333,7 @@ BrowseCntl = ($scope, $routeParams, $resource, Project, $location) ->
 
   $scope.closeScreenerModal = ->
     $('.modal-backdrop').hide()
+    screenerModal = false
 
   $scope.close = (cancelled) ->
     if cancelled and $scope.addingReview
