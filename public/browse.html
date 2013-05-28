@@ -89,6 +89,18 @@
   </div>
 </div>
 
+<div modal="screenerModal" close="closeScreenerModal()" class="screenerwin" options="opts">
+  <div class="modal-header">
+    <h4>Screening {{project.title}}</h4>
+  </div>
+  <div class="modal-body">
+    <video id="screenervid" class="video-js vjs-default-skin"
+      controls preload="auto" width="640" height="264">
+     <source src="{{project.screener}}" />
+    </video>
+  </div>
+</div>
+
 <div modal="viewOrAdd" close="closeViewOrAddReview()" options="opts">
   <div class="modal-header">
     <h4>Would you like to..</h4>
@@ -104,8 +116,11 @@
     <h4>Would you like to..</h4>
   </div>
   <div class="modal-body">
-    <a href="/opp/upscreener/{{project._id}}" target="_blank" ><button class="btn btn-primary">Upload a Screener</button></a>
-    <button ng-click="uploadScript()" class="btn btn-primary">Upload a Script</button>
+    <a href="/opp/upload/screener/{{project._id}}" target="_blank" ><button  ng-show="!project.hasScreener" class="btn btn-primary">Upload a Screener</button></a>
+    <button class="btn btn-primary" ng-click="showScreener(project)" ng-show="project.hasScreener">View Screener</button></a>
+    <a href="/opp/upload/script/{{project._id}}" target="_blank"><button ng-click="uploadScript()" class="btn btn-primary" ng-show="!project.hasScript">Upload a Script</button></a>
+    <a href="{{project.script}}" target="_blank"><button class="btn btn-primary" ng-click="showScript(project)" ng-show="project.hasScript">View Script</button></a>
+    <a href="/opp/upload/files/{{project._id}}" target="_blank"><button ng-click="uploadFiles()" class="btn btn-primary">Upload/Review Other Files</button></a>
   </div>
 </div>
 

@@ -67,6 +67,12 @@
     <script src="/js/jquery.fileupload-validate.js"></script>
     <script src="/js/script.js"></script>
     
+    <link href="/css/video-js.css" rel="stylesheet">
+    <script src="/js/video.js"></script>
+    <script>
+      videojs.options.flash.swf = "/video-js.swf"
+    </script>
+
     <link rel="stylesheet" type="text/css" href="/css/main.css"/>
   </head>
   <body>
@@ -75,6 +81,7 @@
       <div ng-controller="MainCntl" id="mainctl">
         <div class="head high1 sixteen columns">
           <div class="eleven columns">
+            <img src="/img/oars.png" style="height: 55px; padding-right: 25px;"/>
             <span>{{sessionInfo.name}}</span>&nbsp;&nbsp;
             <span ng-repeat="crumb in crumblinks">
               <span class="sep{{$index}}">|</span>

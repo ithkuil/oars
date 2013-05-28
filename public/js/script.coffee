@@ -105,7 +105,7 @@ window.MainCntl = ($scope, $route, $routeParams, $location, $resource, $http) ->
   $scope.$routeParams = $routeParams
   $scope.crumbs = [ '/opp/addtitle=Add Title', '/opp/dash=Dashboard',
                     '/opp/settings=Settings', '/opp/settings/adduser=Add User', 
-                    '/opp/browse=Browse Titles', 'opp/upscreener=Upload Screener',
+                    '/opp/browse=Browse Titles', 'opp/upload=Upload',
                     '/opp=Opportunities', '/=OARS' ]
 
   UserData = $resource "/sessiondata"
@@ -264,20 +264,26 @@ BrowseCntl = ($scope, $routeParams, $resource, Project, $location) ->
     $scope.addingReview = false
     $scope.editableReview = false
 
+  $scope.showScreener = (project) ->
+    $scope.screenerModal = true
 
   $scope.addViewFiles = (project) ->
     $scope.project = project
     $scope.viewOrAddFiles = false
+
     $('.modal-backdrop').show()
     $scope.viewOrAddFiles = true
 
-  $scope.addReview = (project) ->
-    $scope.project = project
-    $scope.viewOrAddFiles = false   
-    $scope.uploaderOpen = true
+  #$scope.addReview = (project) ->
+  #  console.log "Clicked on add review. project is:"
+  #  console.log project
+  #  $scope.project = project
+  #  $scope.viewOrAdd = true
+  #  $scope.uploaderOpen = false
 
 
   $scope.addViewReviews = (project) ->
+    console.log 'addviewreviews'
     $scope.project = project
     $scope.viewOrAdd = false
     $('.modal-backdrop').show()
@@ -320,6 +326,13 @@ BrowseCntl = ($scope, $routeParams, $resource, Project, $location) ->
     $scope.viewMode = false
     Project.save $scope.project, (project) ->
       $location.path "/opp/browse"
+
+  $scope.closeViewOrAddFiles = ->
+    $('.modal-backdrop').hide()
+    $scope.viewOrAddFiles = false
+
+  $scope.closeScreenerModal = ->
+    $('.modal-backdrop').hide()
 
   $scope.close = (cancelled) ->
     if cancelled and $scope.addingReview
@@ -405,7 +418,7 @@ UploadScreenerCntl = ($scope, $location, $routeParams, Project) ->
   Project.get
     id: $routeParams.projectId
   , (project) ->    
-    self.original = project
+    self.original = project    
     $scope.$parent.showView = $scope.$parent.sessionInfo.permissions.opportunities is 'readwrite'
     $scope.project = new Project(self.original)
 
@@ -422,11 +435,19 @@ UploadScreenerCntl = ($scope, $location, $routeParams, Project) ->
         $this.remove()
     )
 
+    filetypes =
+      screener: /(\.|\/)(mp4|ogv|mpg|avi|mov|wmv|264|3g2|3gp|3gp2|divx|dvx|h264|m4v|m4e|mp4v|mpeg|mpeg4|mpg2|ogm|ogx|qt|swf|vob|webm|xvid)$/i
+      script: /(\.|\/)(pdf)$/i
+    if $routeParams.type in [ 'screener', 'script']
+      acceptTypes = filetypes[$routeParams.type]
+    else
+      acceptTypes = /[^]+/i
+
     $("#fileupload").fileupload(
       url: url
       dataType: "json"
       autoUpload: false
-      acceptFileTypes: /(\.|\/)(mp4|ogv|mpg|avi|mov|wmv|264|3g2|3gp|3gp2|divx|dvx|h264|m4v|m4e|mp4v|mpeg|mpeg4|mpg2|ogm|ogx|qt|swf|vob|webm|xvid)$/i
+      acceptFileTypes: acceptTypes
       maxFileSize: 15000000000
       loadImageMaxFileSize: 1500000000
       disableImageResize: true
@@ -449,13 +470,25 @@ UploadScreenerCntl = ($scope, $location, $routeParams, Project) ->
       data.context.find("button").text("Upload").prop "disabled", !!data.files.error  if index + 1 is data.files.length
     ).on("fileuploadprogressall", (e, data) ->
       progress = parseInt(data.loaded / data.total * 100, 10)
+      console.log data
       $("#progress .bar").css "width", progress + "%"
     ).on("fileuploaddone", (e, data) ->
       $.each data.result.files, (index, file) ->
         link = $("<a>").attr("target", "_blank").prop("href", file.url)
         $(data.context.children()[index]).wrap link
-        window.location.href = '/opp/browse'
-        #$location.path '/opp/browse'
+        if $routeParams.type is 'screener'
+          $scope.project.hasScreener = true
+          $scope.project.screener = file.url
+        else if $routeParams.type is 'script'
+          $scope.project.script = file.url
+          $scope.project.hasScript = true
+        else
+          if not $scope.project.files?.length > 0
+            $scope.project.files = []
+          $scope.project.files.push file.url
+        $scope.project.update ->
+          window.location.href = '/opp/browse'
+          #$location.path '/opp/browse'
 
     ).on "fileuploadfail", (e, data) ->
       $.each data.result.files, (index, file) ->
@@ -551,7 +584,7 @@ mod = ($routeProvider, $locationProvider) ->
     templateUrl: "/eventdetail.html"
     controller: EditEventCntl
 
-  $routeProvider.when "/opp/upscreener/:projectId",
+  $routeProvider.when "/opp/upload/:type/:projectId",
     templateUrl: "/upload.html"
     controller: UploadScreenerCntl
 

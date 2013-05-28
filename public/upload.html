@@ -1,5 +1,5 @@
 <div class="thirteen columns high1">
-<h4>Upload Screener for {{project.title}}</h4>
+<h4>Upload for {{project.title}}</h4>
 <br/><br/>
 
   <!-- The fileinput-button span is used to style the file input field as button -->
@@ -17,5 +17,5 @@
     </div>
     <!-- The container for the uploaded files -->
     <div id="files"></div>       
-  
+    <li ng-repeat="file in project.files"><a href="{{file}}" target="_blank">{{file}}</a></div>
 </div>
