@@ -19,7 +19,7 @@ body {
 }
 
 .overlayvid {
-  position: absolute; left: 50%; bottom: 75px; margin: 0;
+  position: fixed; left: 50%; bottom: 75px; margin: 0;
   margin-left: -100px;
   z-index: 2147483647;
   font-size: 16pt;
