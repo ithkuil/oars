@@ -233,26 +233,13 @@ BrowseCntl = ($scope, $routeParams, $resource, Project, $location) ->
   $scope.sources = Source.query {}, ->
   $scope.genres = genres
   $scope.screened = $scope.$parent.sessionInfo.name
-  ###
+  
   $(document).bind 'webkitfullscreenchange mozfullscreenchange fullscreenchange', ->
     isFullScreen = document.fullScreen or document.mozFullScreen or document.webkitIsFullScreen
     if isFullScreen
-      logo = document.createElement "div"
-      logo.innerHTML = "SCREENED BY #{$scope.screened}"
-      logo.id = 'fsoverlay'
-      logo.className = "overlayvid"
-
-      fsElement = $('video')[0]
-      #if document.mozFullScreenElement? then fsElement = document.mozFullScreenElement
-      #else if document.webkitFullscreenElement? then fsElement = document.webkitFullscreenElement
-      #else if document.fullScreenElement? then fsElement = document.fullScreenElement
-      #else fsElement = false
-
-      if fsElement?
-        console.log 'fsElement'
-        console.log fsElement
-       fsElement.appendChild logo
-    ###  
+      $('.overlayvid').css 'position', 'fixed'
+    else
+      $('.overlayvid').css 'position', 'absolute'
 
   $scope.closeViewOrAddReview = ->
     $scope.viewOrAdd = false
