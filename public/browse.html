@@ -8,7 +8,7 @@
 
   <br>
   <li class="project" ng-repeat="project in projects">
-    <h5>{{project.title}}</h5>
+    <h5><a href="/opp/projects/edit/{{project._id}}">{{project.title}}</a></h5>
     <div class="part1"><label>Status:</label><span class="cardtext">{{project.status}}</span></div>
     <div class="part1"><label>Writers:</label><span class="cardtext">{{project.writers.join(', ')}}</span></div>
     <div class="part1"><label>Director:</label><span class="cardtext">{{project.director}}</span></div>
@@ -20,7 +20,7 @@
     <div class="part1"><label><a href="{{project.imdb}}" target="_blank">IMDB</a></label></div>
     <a href="#" ng-click="addViewReviews(project)"><div class="attached">Add/View<br>{{project.reviews.length}} Reviews</div></a>
     <div class="attached">Add/View<br>{{project.projections.length}} Projections</div>
-    <a href="#" ng-click="addViewFiles(project)"><div class="attached">Add/View<br>{{project.projections.length}} Files</div></a>
+    <a href="#" ng-click="addViewFiles(project)"><div class="attached">Add/View<br>{{project.files.length + ( project.hasScreener )}} Files</div></a>
   </li>
 </div>
 
@@ -98,9 +98,10 @@
       controls preload="auto" width="640" height="264">
      <source src="{{project.screener}}" />
     </video>
+    <div class="overlayvid">SCREENED BY {{screened}}</div>
   </div>
 </div>
-
+<!-- <div class="overlayvid">SCREENED BY {{screened}}</div> -->
 <div modal="viewOrAdd" close="closeViewOrAddReview()" options="opts">
   <div class="modal-header">
     <h4>Would you like to..</h4>

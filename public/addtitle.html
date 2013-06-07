@@ -1,5 +1,5 @@
 <form name="projectForm" class="high1 cent1">
-<h2>Add Title</h2>
+<h2>{{verb}} Title</h2>
 
   <div class="control-group" ng-class="{error: projectForm.title.$invalid}">
     <label>Title</label>
@@ -12,8 +12,8 @@
     <div class="control-group">
       <label>Writers</label>
         <li ng-repeat="item in project.writers">{{item}}&nbsp;<a ng-click="delete($index)">x</a></li>
-        <input type="text" name="writer" ng-model="project.writeradd" >
-        <button ng-click="addWriter()" class="btn btn-primary up1">Add Writer</button>
+        <input type="text" name="writer" onkeydown="writerkey" ng-model="project.writeradd" >
+        <button ng-click="addWriter()" class="btn btn-primary up1">Add Writer</button> (or press enter)
       </div>
     <span ng-show="projectForm.writers.$error.required" class="help-inline">
         Required</span>
@@ -34,8 +34,8 @@
 
   <label>Cast</label>
     <li ng-repeat="item in project.cast">{{item}}&nbsp;<a ng-click="deleteCast($index)">x</a></li>
-    <input type="text" name="cast" ng-model="project.castadd" >
-    <button ng-click="addCast()" class="btn btn-primary up1">Add Cast Member</button>
+    <input type="text" name="cast" id="castinp" ng-model="project.castadd" >
+    <button ng-click="addCast()" class="btn btn-primary up1">Add Cast Member</button> (or press enter)
 
   <label>Synopsis</label>
   <textarea name="synopsis" ng-model="project.synopsis"></textarea>

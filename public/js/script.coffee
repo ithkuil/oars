@@ -158,6 +158,7 @@ AddTitleCntl = ($scope, $location, $routeParams, $resource, Project) ->
   $scope.$parent.showView = $scope.$parent.sessionInfo.permissions.opportunities is 'readwrite'
   $scope.statuses = statuses
   $scope.genres = genres
+  $scope.verb = "New"
   Opps = $resource "/data/opportunity"
   $scope.oppsources = Opps.query {}, ->
 
@@ -167,18 +168,18 @@ AddTitleCntl = ($scope, $location, $routeParams, $resource, Project) ->
     else
       $scope.project.writers = [ $scope.project.writeradd ]
     $scope.project.writeradd = ''
-  $scope.delete = (idx) ->
-    removeWriter $scope, idx
+
   $scope.addCast = ->
     if $scope.project.cast?
       $scope.project.cast.push $scope.project.castadd
     else
       $scope.project.cast = [ $scope.project.castadd ]
     $scope.project.castadd = ''
-  $scope.deleteCast = (idx) ->
-    $scope.project.cast.splice idx, 1
-  $scope.delete = (idx) ->
-    removeWriter $scope, idx
+
+  $scope.deleteCast = (idx) -> $scope.project.cast.splice idx, 1
+
+  $scope.delete = (idx) -> removeWriter $scope, idx
+
   $scope.save = ->
     if not $scope.project.reviews?
       $scope.project.reviews = []
@@ -231,6 +232,27 @@ BrowseCntl = ($scope, $routeParams, $resource, Project, $location) ->
   Source = $resource "/data/sources"
   $scope.sources = Source.query {}, ->
   $scope.genres = genres
+  $scope.screened = $scope.$parent.sessionInfo.name
+  ###
+  $(document).bind 'webkitfullscreenchange mozfullscreenchange fullscreenchange', ->
+    isFullScreen = document.fullScreen or document.mozFullScreen or document.webkitIsFullScreen
+    if isFullScreen
+      logo = document.createElement "div"
+      logo.innerHTML = "SCREENED BY #{$scope.screened}"
+      logo.id = 'fsoverlay'
+      logo.className = "overlayvid"
+
+      fsElement = $('video')[0]
+      #if document.mozFullScreenElement? then fsElement = document.mozFullScreenElement
+      #else if document.webkitFullscreenElement? then fsElement = document.webkitFullscreenElement
+      #else if document.fullScreenElement? then fsElement = document.fullScreenElement
+      #else fsElement = false
+
+      if fsElement?
+        console.log 'fsElement'
+        console.log fsElement
+       fsElement.appendChild logo
+    ###  
 
   $scope.closeViewOrAddReview = ->
     $scope.viewOrAdd = false
@@ -375,13 +397,55 @@ NewUserCntl = ($scope, $location, User) ->
 removeWriter = (scope, idx) ->
   scope.project.writers.splice idx, 1
 
-EditProjectCntl = ($scope, $location, $routeParams, Project) ->
+EditProjectCntl = ($scope, $location, $routeParams, $resource, Project) ->
   self = this
+  $scope.verb = "Edit"
   Project.get
     id: $routeParams.projectId
   , (project) ->
     self.original = project
     $scope.project = new Project(self.original)
+
+  $scope.$parent.crumblinks = $scope.$parent.breadcrumb()
+  $scope.$parent.showView = $scope.$parent.sessionInfo.permissions.opportunities is 'readwrite'
+  $scope.statuses = statuses
+  $scope.genres = genres
+
+  Opps = $resource "/data/opportunity"
+  $scope.oppsources = Opps.query {}, ->
+
+  $('#writerinp').keydown (ev) ->
+    if ev.keyCode is 13
+      ev.stopPropagation()
+      $scope.addWriter()
+
+  $('#castinp').keydown (ev) ->
+    if ev.keyCode is 13
+      ev.stopPropagation()
+      $scope.addCast()
+
+
+  $scope.addWriter = ->
+    if $scope.project.writeradd? and $scope.project.writeradd.length > 0
+      if $scope.project.writers?
+        $scope.project.writers.push $scope.project.writeradd
+      else
+        $scope.project.writers = [ $scope.project.writeradd ]
+      $scope.project.writeradd = ''
+
+  $scope.castkey = (ev) ->
+    
+
+  $scope.addCast = ->
+    if $scope.project.cast?
+      $scope.project.cast.push $scope.project.castadd
+    else
+      $scope.project.cast = [ $scope.project.castadd ]
+    $scope.project.castadd = ''
+
+  $scope.deleteCast = (idx) -> $scope.project.cast.splice idx, 1
+
+  $scope.delete = (idx) -> removeWriter $scope, idx
 
   $scope.isClean = ->
     angular.equals self.original, $scope.project
@@ -549,6 +613,10 @@ mod = ($routeProvider, $locationProvider) ->
     controller: AddTitleCntl
   
 
+  $routeProvider.when "/opp/projects/edit/:projectId",
+    templateUrl: "/addtitle.html"
+    controller: EditProjectCntl
+
   $routeProvider.when "/opp/settings",
     templateUrl: "/settings.html"
     controller: SettingsCntl
@@ -577,9 +645,6 @@ mod = ($routeProvider, $locationProvider) ->
     templateUrl: "/users.html"
     controller: ListUsersCntl      
 
-  $routeProvider.when "/opp/project/edit/:projectId",
-    templateUrl: "/addtitle.html"
-    controller: EditProjectCntl
 
   $routeProvider.when "/opp/event/edit/:eventId",
     templateUrl: "/eventdetail.html"
