@@ -7,6 +7,7 @@ prettyjson = require 'prettyjson'
 uploads = require './uploads'
 request = require 'request'
 
+BASEECURL = 'http://oarsmanagement.com:8000'
 
 fs = require 'fs'
 Mongolian = require 'mongolian'
@@ -189,8 +190,9 @@ app.post '/data/opportunity', (req, res) ->
   opportunity.insert req.body
   res.end('1')
 
+
 app.get '/newcalc/:projectid/:projection', (req, res) ->
-  outurl = "http://localhost:8000/#{req.params.projectid}_#{req.params.projection}"
+  outurl = "#{BASEECURL}/#{req.params.projectid}_#{req.params.projection}"
   puturl = "http://localhost:8000/_/#{req.params.projectid}_#{req.params.projection}"
   request.get 'http://localhost:8000/_/projection', (err, resp, body) ->
     console.log 'projectid is'
