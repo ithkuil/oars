@@ -3,5 +3,7 @@ npm install
 mkdir tmp
 mkdir public/files
 coffee -c public/js/*.coffee
+pkill -f ethercalc
+ethercalc &
 coffee server.coffee
 

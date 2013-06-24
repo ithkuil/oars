@@ -19,7 +19,9 @@
     <div class="part1"><label>Budget:</label><span class="cardtext">{{project.budget}}</span></div>
     <div class="part1"><label><a href="{{project.imdb}}" target="_blank">IMDB</a></label></div>
     <a href="#" ng-click="addViewReviews(project)"><div class="attached">Add/View<br>{{project.reviews.length}} Reviews</div></a>
-    <div class="attached">Add/View<br>{{project.projections.length}} Projections</div>
+
+    <a href="#" ng-click="addViewProjections(project)"><div class="attached">Add/View<br>{{project.projections.length}} Projections</div></a>
+
     <a href="#" ng-click="addViewFiles(project)"><div class="attached">Add/View<br>{{project.files.length + ( project.hasScreener )}} Files</div></a>
   </li>
 </div>
@@ -111,6 +113,18 @@
     <button ng-click="readReviews()" class="btn btn-primary">Read Reviews</button>
   </div>
 </div>
+
+<!-- <div class="overlayvid">SCREENED BY {{screened}}</div> -->
+<div modal="viewOrAddProjections" close="closeViewOrAddProjections()" options="opts">
+  <div class="modal-header">
+    <h4>Existing Projection(s)</h4>    
+  </div>
+  <div class="modal-body">
+    <li ng-repeat="projection in project.projections"><a target="_blank" href="http://localhost:8000/{{project._id}}_{{$index}}">Projection {{$index+1}}</a></li>
+    <button ng-click="addProjection(project)" class="btn btn-primary">Add Projection</button>    
+  </div>
+</div>
+
 
 <div modal="viewOrAddFiles" close="closeViewOrAddFiles()" options="opts">
   <div class="modal-header">

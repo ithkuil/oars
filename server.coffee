@@ -5,6 +5,8 @@ https = require 'https'
 http = require 'http'
 prettyjson = require 'prettyjson'
 uploads = require './uploads'
+request = require 'request'
+
 
 fs = require 'fs'
 Mongolian = require 'mongolian'
@@ -187,6 +189,32 @@ app.post '/data/opportunity', (req, res) ->
   opportunity.insert req.body
   res.end('1')
 
+app.get '/newcalc/:projectid/:projection', (req, res) ->
+  outurl = "http://localhost:8000/#{req.params.projectid}_#{req.params.projection}"
+  puturl = "http://localhost:8000/_/#{req.params.projectid}_#{req.params.projection}"
+  request.get 'http://localhost:8000/_/projection', (err, resp, body) ->
+    console.log 'projectid is'
+    idobj = { _id: req.params.projectid }
+    convertids idobj
+    console.log "resp is"
+    console.log resp
+    console.log 'body is'
+    console.log body
+    projects.findOne { _id: idobj._id }, (err, project) ->  
+      console.log 'err is'    
+      console.log err
+      console.log 'project is'
+      console.log project
+      if not project.projections?
+        project.projections = []
+      project.projections.push { title: project.title }
+      projects.update idobj, project
+      body = body.replace /\{\{title\}\}/g, project.title 
+      console.log body
+      request.put puturl, { body: body }, (err, rsp, bd) ->
+        delay 500, -> res.redirect outurl
+
+
 #/opportunity
 
 app.get '/data/projects', (req, res) ->
@@ -221,6 +249,7 @@ app.post '/data/projects', (req, res) ->
   console.log 'post = insert project'
   projects.insert req.body
   res.end('1')
+
 
 app.post '/data/reviews/add/:projectid', (req, res) ->
   console.log 'add review'

@@ -268,6 +268,21 @@ BrowseCntl = ($scope, $routeParams, $resource, Project, $location) ->
     project.reviews.push $scope.review
     $scope.shouldBeOpen = true
 
+  $scope.addProjection = (project) ->
+    $scope.project = project
+    $scope.projection =
+      title: project.title
+    $scope.project.projections.push $scope.projection
+    self = this
+
+    Project.get
+      id: project._id
+    , (project) ->      
+      proj = new Project(project)
+      project.update ->
+      window.open "/newcalc/#{project._id}/#{$scope.project.projections.length-1}"    
+
+
   $scope.editReview = ->
     $scope.viewMode = false
     $scope.addingReview = false
@@ -283,13 +298,18 @@ BrowseCntl = ($scope, $routeParams, $resource, Project, $location) ->
     $('.modal-backdrop').show()
     $scope.viewOrAddFiles = true
 
-  #$scope.addReview = (project) ->
-  #  console.log "Clicked on add review. project is:"
-  #  console.log project
-  #  $scope.project = project
-  #  $scope.viewOrAdd = true
-  #  $scope.uploaderOpen = false
-
+  $scope.addViewProjections = (project) ->
+    $scope.project = project
+    $scope.viewOrAddProjections = false
+    $('.modal-backdrop').show()
+    if not project.projections? or project.projections?.length is 0
+      $scope.project.projections = []
+      $scope.addProjection project
+    else
+      console.log "project.projections is"
+      console.log project.projections
+      $scope.shouldBeOpen = false
+      $scope.viewOrAddProjections = true
 
   $scope.addViewReviews = (project) ->
     console.log 'addviewreviews'
@@ -339,6 +359,10 @@ BrowseCntl = ($scope, $routeParams, $resource, Project, $location) ->
   $scope.closeViewOrAddFiles = ->
     $('.modal-backdrop').hide()
     $scope.viewOrAddFiles = false
+
+  $scope.closeViewOrAddProjections = ->
+    $('.modal-backdrop').hide()
+    $scope.viewOrAddProjections = false
 
   $scope.closeScreenerModal = ->
     $('.modal-backdrop').hide()
